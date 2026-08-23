@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Create Account | CareerSeekho</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+</head>
+
+<body class="auth-page">
+
+  <div class="auth-container">
+
+    <!-- BRAND -->
+    <div class="auth-brand">
+      <a href="index.html" class="logo">
+        <div class="logo-icon">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+
+        <span>Career<span>Seekho</span></span>
+      </a>
+    </div>
+
+
+    <!-- SIGNUP CARD -->
+    <div class="auth-card">
+
+      <div class="auth-header">
+
+        <div class="auth-icon">
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+
+        <h1>Create Account</h1>
+
+        <p>
+          Start your journey with CareerSeekho
+        </p>
+
+      </div>
+
+
+      <!-- GOOGLE -->
+      <button class="google-btn" id="googleSignup">
+        <i class="fa-brands fa-google"></i>
+        Continue with Google
+      </button>
+
+
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
+
+      <!-- SIGNUP FORM -->
+      <form id="signupForm">
+
+        <!-- NAME -->
+        <div class="input-group">
+
+          <label for="name">
+            Full Name
+          </label>
+
+          <div class="input-box">
+
+            <i class="fa-regular fa-user"></i>
+
+            <input
+              type="text"
+              id="name"
+              placeholder="Enter your name"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- EMAIL -->
+        <div class="input-group">
+
+          <label for="signupEmail">
+            Email Address
+          </label>
+
+          <div class="input-box">
+
+            <i class="fa-regular fa-envelope"></i>
+
+            <input
+              type="email"
+              id="signupEmail"
+              placeholder="Enter your email"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- PASSWORD -->
+        <div class="input-group">
+
+          <label for="signupPassword">
+            Password
+          </label>
+
+          <div class="input-box">
+
+            <i class="fa-solid fa-lock"></i>
+
+            <input
+              type="password"
+              id="signupPassword"
+              placeholder="Create a password"
+              minlength="6"
+              required
+            >
+
+            <button
+              type="button"
+              class="password-toggle"
+              id="signupPasswordToggle"
+            >
+              <i class="fa-regular fa-eye"></i>
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- CONFIRM PASSWORD -->
+        <div class="input-group">
+
+          <label for="confirmPassword">
+            Confirm Password
+          </label>
+
+          <div class="input-box">
+
+            <i class="fa-solid fa-lock"></i>
+
+            <input
+              type="password"
+              id="confirmPassword"
+              placeholder="Confirm your password"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- TERMS -->
+        <label class="remember signup-terms">
+
+          <input
+            type="checkbox"
+            id="terms"
+            required
+          >
+
+          <span>
+            I agree to CareerSeekho's
+            <a href="#">Terms & Privacy Policy</a>
+          </span>
+
+        </label>
+
+
+        <!-- CREATE ACCOUNT -->
+        <button type="submit" class="login-btn">
+          Create Account
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+      </form>
+
+
+      <p class="signup-text">
+
+        Already have an account?
+
+        <a href="login.html">
+          Login
+        </a>
+
+      </p>
+
+    </div>
+
+
+    <p class="auth-footer">
+      © 2026 CareerSeekho. All rights reserved.
+    </p>
+
+  </div>
+
+
+  <script>
+
+    // PASSWORD SHOW / HIDE
+
+    const signupPasswordToggle =
+      document.getElementById("signupPasswordToggle");
+
+    const signupPassword =
+      document.getElementById("signupPassword");
+
+    signupPasswordToggle.addEventListener("click", () => {
+
+      if (signupPassword.type === "password") {
+
+        signupPassword.type = "text";
+
+        signupPasswordToggle.innerHTML =
+          '<i class="fa-regular fa-eye-slash"></i>';
+
+      } else {
+
+        signupPassword.type = "password";
+
+        signupPasswordToggle.innerHTML =
+          '<i class="fa-regular fa-eye"></i>';
+
+      }
+
+    });
+
+
+    // SIGNUP DEMO
+
+    document
+      .getElementById("signupForm")
+      .addEventListener("submit", (event) => {
+
+        event.preventDefault();
+
+        const password =
+          document.getElementById("signupPassword").value;
+
+        const confirmPassword =
+          document.getElementById("confirmPassword").value;
+
+        if (password !== confirmPassword) {
+
+          alert("Passwords do not match.");
+
+          return;
+        }
+
+        alert(
+          "Account creation will be connected to the CareerSeekho backend."
+        );
+
+      });
+
+
+    // GOOGLE SIGNUP
+
+    document
+      .getElementById("googleSignup")
+      .addEventListener("click", () => {
+
+        alert(
+          "Google Sign Up will be connected in the authentication setup."
+        );
+
+      });
+
+  </script>
+
+</body>
+</html>
