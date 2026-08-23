@@ -1219,3 +1219,142 @@ button {
 .footer-legal span {
   opacity: 0.5;
 }
+/* Founder Image - Straight / No Effect */
+.founder-card {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+.founder-card:hover {
+  transform: none !important;
+}
+
+.founder-card img {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+  filter: none !important;
+}
+
+.founder-card img:hover {
+  transform: none !important;
+  filter: none !important;
+}
+
+.image-glow {
+  display: none !important;
+}
+/* Disable ALL founder image hover movement */
+.founder-card,
+.founder-card:hover,
+.founder-card img,
+.founder-card img:hover {
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+/* ================================
+   MOBILE RESPONSIVE ADJUSTMENT
+   ================================ */
+
+@media (max-width: 768px) {
+
+  /* Founder section */
+  .hero-image {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .founder-card {
+    width: min(85vw, 360px);
+    max-width: 360px;
+  }
+
+  .founder-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* Hero content */
+  .hero-content {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .hero p {
+    font-size: 1rem;
+  }
+
+  /* Buttons */
+  .hero-buttons {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  /* Topics */
+  .topics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Videos */
+  .videos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Prevent horizontal scrolling */
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+/* =================================
+   FOUNDER IMAGE - CENTER & STRAIGHT
+   ================================= */
+
+.hero-image {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.founder-card {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  transform: none !important;
+  rotate: none !important;
+}
+
+.founder-card img {
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transform: none !important;
+  rotate: none !important;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .hero-image {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .founder-card {
+    margin: 0 auto !important;
+  }
+}
