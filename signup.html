@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,19 +17,21 @@
 
   <div class="auth-container">
 
-    <!-- BRAND -->
     <div class="auth-brand">
+
       <a href="index.html" class="logo">
+
         <div class="logo-icon">
           <i class="fa-solid fa-graduation-cap"></i>
         </div>
 
         <span>Career<span>Seekho</span></span>
+
       </a>
+
     </div>
 
 
-    <!-- SIGNUP CARD -->
     <div class="auth-card">
 
       <div class="auth-header">
@@ -46,10 +49,16 @@
       </div>
 
 
-      <!-- GOOGLE -->
-      <button class="google-btn" id="googleSignup">
+      <button
+        class="google-btn"
+        id="googleSignup"
+        type="button"
+      >
+
         <i class="fa-brands fa-google"></i>
+
         Continue with Google
+
       </button>
 
 
@@ -58,10 +67,8 @@
       </div>
 
 
-      <!-- SIGNUP FORM -->
       <form id="signupForm">
 
-        <!-- NAME -->
         <div class="input-group">
 
           <label for="name">
@@ -76,6 +83,7 @@
               type="text"
               id="name"
               placeholder="Enter your name"
+              autocomplete="name"
               required
             >
 
@@ -84,7 +92,6 @@
         </div>
 
 
-        <!-- EMAIL -->
         <div class="input-group">
 
           <label for="signupEmail">
@@ -99,6 +106,7 @@
               type="email"
               id="signupEmail"
               placeholder="Enter your email"
+              autocomplete="email"
               required
             >
 
@@ -107,7 +115,6 @@
         </div>
 
 
-        <!-- PASSWORD -->
         <div class="input-group">
 
           <label for="signupPassword">
@@ -123,6 +130,7 @@
               id="signupPassword"
               placeholder="Create a password"
               minlength="6"
+              autocomplete="new-password"
               required
             >
 
@@ -131,7 +139,9 @@
               class="password-toggle"
               id="signupPasswordToggle"
             >
+
               <i class="fa-regular fa-eye"></i>
+
             </button>
 
           </div>
@@ -139,7 +149,6 @@
         </div>
 
 
-        <!-- CONFIRM PASSWORD -->
         <div class="input-group">
 
           <label for="confirmPassword">
@@ -154,6 +163,7 @@
               type="password"
               id="confirmPassword"
               placeholder="Confirm your password"
+              autocomplete="new-password"
               required
             >
 
@@ -162,7 +172,6 @@
         </div>
 
 
-        <!-- TERMS -->
         <label class="remember signup-terms">
 
           <input
@@ -173,19 +182,33 @@
 
           <span>
             I agree to CareerSeekho's
-            <a href="#">Terms & Privacy Policy</a>
+            <a href="terms.html">
+              Terms & Privacy Policy
+            </a>
           </span>
 
         </label>
 
 
-        <!-- CREATE ACCOUNT -->
-        <button type="submit" class="login-btn">
+        <button
+          type="submit"
+          class="login-btn"
+          id="signupButton"
+        >
+
           Create Account
+
           <i class="fa-solid fa-arrow-right"></i>
+
         </button>
 
       </form>
+
+
+      <div
+        id="signupMessage"
+        style="margin-top:15px;text-align:center;"
+      ></div>
 
 
       <p class="signup-text">
@@ -210,76 +233,206 @@
 
   <script>
 
-    // PASSWORD SHOW / HIDE
+    const API_URL =
+      "http://localhost:5000";
+
+
+    /* PASSWORD SHOW / HIDE */
 
     const signupPasswordToggle =
-      document.getElementById("signupPasswordToggle");
+      document.getElementById(
+        "signupPasswordToggle"
+      );
 
     const signupPassword =
-      document.getElementById("signupPassword");
+      document.getElementById(
+        "signupPassword"
+      );
 
-    signupPasswordToggle.addEventListener("click", () => {
 
-      if (signupPassword.type === "password") {
+    signupPasswordToggle.addEventListener(
+      "click",
+      () => {
 
-        signupPassword.type = "text";
+        if (
+          signupPassword.type === "password"
+        ) {
 
-        signupPasswordToggle.innerHTML =
-          '<i class="fa-regular fa-eye-slash"></i>';
+          signupPassword.type = "text";
 
-      } else {
+          signupPasswordToggle.innerHTML =
+            '<i class="fa-regular fa-eye-slash"></i>';
 
-        signupPassword.type = "password";
+        } else {
 
-        signupPasswordToggle.innerHTML =
-          '<i class="fa-regular fa-eye"></i>';
+          signupPassword.type = "password";
+
+          signupPasswordToggle.innerHTML =
+            '<i class="fa-regular fa-eye"></i>';
+
+        }
 
       }
+    );
 
-    });
+
+    /* SIGNUP */
+
+    const signupForm =
+      document.getElementById(
+        "signupForm"
+      );
+
+    const signupMessage =
+      document.getElementById(
+        "signupMessage"
+      );
+
+    const signupButton =
+      document.getElementById(
+        "signupButton"
+      );
 
 
-    // SIGNUP DEMO
-
-    document
-      .getElementById("signupForm")
-      .addEventListener("submit", (event) => {
+    signupForm.addEventListener(
+      "submit",
+      async (event) => {
 
         event.preventDefault();
 
+
+        const name =
+          document.getElementById(
+            "name"
+          ).value.trim();
+
+        const email =
+          document.getElementById(
+            "signupEmail"
+          ).value.trim();
+
         const password =
-          document.getElementById("signupPassword").value;
+          document.getElementById(
+            "signupPassword"
+          ).value;
 
         const confirmPassword =
-          document.getElementById("confirmPassword").value;
+          document.getElementById(
+            "confirmPassword"
+          ).value;
+
 
         if (password !== confirmPassword) {
 
-          alert("Passwords do not match.");
+          signupMessage.textContent =
+            "Passwords do not match.";
 
           return;
+
         }
 
-        alert(
-          "Account creation will be connected to the CareerSeekho backend."
-        );
 
-      });
+        if (password.length < 6) {
+
+          signupMessage.textContent =
+            "Password must be at least 6 characters.";
+
+          return;
+
+        }
 
 
-    // GOOGLE SIGNUP
+        signupMessage.textContent =
+          "Creating your account...";
+
+        signupButton.disabled = true;
+
+
+        try {
+
+          const response =
+            await fetch(
+              `${API_URL}/api/signup`,
+              {
+
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body: JSON.stringify({
+                  name,
+                  email,
+                  password
+                })
+
+              }
+            );
+
+
+          const data =
+            await response.json();
+
+
+          if (!response.ok) {
+
+            throw new Error(
+              data.message ||
+              "Signup failed."
+            );
+
+          }
+
+
+          signupMessage.textContent =
+            "Account created successfully!";
+
+
+          setTimeout(() => {
+
+            window.location.href =
+              "login.html";
+
+          }, 1000);
+
+
+        } catch (error) {
+
+          console.error(error);
+
+          signupMessage.textContent =
+            error.message ||
+            "Unable to connect to server.";
+
+        } finally {
+
+          signupButton.disabled = false;
+
+        }
+
+      }
+    );
+
+
+    /* GOOGLE SIGNUP */
 
     document
       .getElementById("googleSignup")
-      .addEventListener("click", () => {
+      .addEventListener(
+        "click",
+        () => {
 
-        alert(
-          "Google Sign Up will be connected in the authentication setup."
-        );
+          alert(
+            "Google Sign Up will be connected after Google OAuth setup."
+          );
 
-      });
+        }
+      );
 
   </script>
 
 </body>
+
 </html>
