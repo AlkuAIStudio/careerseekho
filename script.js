@@ -16081,35 +16081,33 @@ Do not mention that this is a demo.
 
     async function generateStudyNotes() {
 
-        if (
-            !curriculumState.board ||
-            !curriculumState.className ||
-            !curriculumState.subject ||
-            !curriculumState.chapter
-        ) {
+    if (
+        !curriculumState.board ||
+        !curriculumState.className ||
+        !curriculumState.subject ||
+        !curriculumState.chapter
+    ) {
+        alert(
+            "Pehle Board, Class, Stream, Subject aur Chapter select karo."
+        );
+        return;
+    }
 
-            alert(
-                "Pehle Board, Class, Stream, Subject aur Chapter select karo."
-            );
+    const btn = document.getElementById("bbStudyBtn");
 
-            return;
-        }
+    if (!btn) return;
 
-        const btn =
-            document.getElementById("bbStudyBtn");
+    const originalText = btn.innerHTML;
 
-        const originalText =
-            btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = "⏳ BharatBuddy notes bana raha hai...";
 
-        btn.disabled = true;
-        btn.innerHTML = "⏳ AI Notes bana raha hai...";
+    try {
 
-        try {
+        const prompt = `
+You are BharatBuddy AI, a premium student learning assistant.
 
-            const prompt = `
-You are BharatBuddy AI, an educational tutor.
-
-Create ORIGINAL educational study notes for exactly:
+Create ORIGINAL, accurate and student-friendly study notes for EXACTLY this selection:
 
 Board: ${curriculumState.board}
 Class: ${curriculumState.className}
@@ -16117,57 +16115,115 @@ Stream: ${curriculumState.stream || "General"}
 Subject: ${curriculumState.subject}
 Chapter: ${curriculumState.chapter}
 
-STRICT RULES:
-1. Do not mix another class.
-2. Do not mix another board.
-3. Do not mix another chapter.
-4. Do not reproduce textbook paragraphs.
-5. Explain in simple student-friendly language.
-6. Include important concepts.
-7. Include definitions where useful.
-8. Include formulas only where relevant.
-9. Include examples.
-10. End with 5 quick revision points.
+IMPORTANT:
+- Follow ONLY the selected Board, Class, Subject and Chapter.
+- Do not mix another class, board or chapter.
+- Do not reproduce textbook paragraphs.
+- Create original explanations.
+- Use simple language suitable for students.
+- If Hindi terms are useful, include them naturally.
+- Do not invent syllabus-specific facts.
+- If a formula is not relevant, do not force one.
 
-Use clear headings and bullet points.
+STRUCTURE YOUR RESPONSE EXACTLY LIKE THIS:
+
+# 📚 ${curriculumState.chapter}
+
+## 🎯 Chapter Overview
+Give a short and easy introduction.
+
+## 💡 Core Concepts
+Explain the most important concepts one by one.
+
+## 📖 Important Definitions
+Give important definitions in simple language.
+
+## 🧮 Important Formulas
+Give only relevant formulas.
+For every formula, explain what the symbols mean.
+
+## 🔍 Easy Examples
+Give 2-4 simple examples related to the chapter.
+
+## ⚠️ Common Mistakes
+Give common mistakes students should avoid.
+
+## 📝 Exam Focus
+Give important points that students should remember for board exams.
+
+## ⚡ Quick Revision
+Give exactly 5 short revision points.
+
+## 🎯 Final Tip
+Give one useful study tip for this chapter.
+
+FORMATTING RULES:
+- Use Markdown headings with # and ##.
+- Use bullet points with -.
+- Use **bold** for important words.
+- Put mathematical formulas inside $$formula$$.
+- Keep paragraphs short.
+- Do not write unnecessary greetings or long introductions.
+- Do not mention that you are an AI.
 `;
 
-            if (typeof askAI === "function") {
-
-                const response =
-                    await askAI(prompt);
-
-                showBoardAIResult(
-                    response,
-                    "📚 AI Study Notes"
-                );
-
-            } else {
-
-                alert(
-                    "AI function available nahi hai. Existing askAI() function check karo."
-                );
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Board AI Error:",
-                error
-            );
-
+        if (typeof askAI !== "function") {
             alert(
-                "AI Notes generate nahi ho paaye. Internet/API check karo."
+                "AI function available nahi hai. Existing askAI() function check karo."
+            );
+            return;
+        }
+
+        const response = await askAI(prompt);
+
+        /*
+         * Premium Study Notes Renderer
+         */
+
+        if (
+            typeof window.BharatBuddyPremiumNotes === "function"
+        ) {
+
+            const formattedHTML =
+                window.BharatBuddyPremiumNotes(
+                    response,
+                    curriculumState.subject,
+                    curriculumState.chapter
+                );
+
+            showBoardAIResult(
+                formattedHTML,
+                "📚 AI Study Notes"
             );
 
-        } finally {
+        } else {
 
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+            showBoardAIResult(
+                response,
+                "📚 AI Study Notes"
+            );
+
         }
+
+    } catch (error) {
+
+        console.error(
+            "Board AI Error:",
+            error
+        );
+
+        alert(
+            "AI Notes generate nahi ho paaye. Internet/API check karo."
+        );
+
+    } finally {
+
+        btn.disabled = false;
+        btn.innerHTML = originalText;
     }
+}
 
-
+    
     /* =====================================================
        CHAPTER TEST
     ===================================================== */
@@ -16262,64 +16318,142 @@ Return clean readable text.
 
     function showBoardAIResult(text, title) {
 
-        const pageContent =
-            document.getElementById("pageContent");
+    const pageContent =
+        document.getElementById("pageContent");
 
-        if (!pageContent) return;
+    if (!pageContent) return;
 
-        const old =
-            document.getElementById(
-                "bbBoardAIResult"
+    const old =
+        document.getElementById("bbBoardAIResult");
+
+    if (old) old.remove();
+
+    const result =
+        document.createElement("div");
+
+    result.id = "bbBoardAIResult";
+
+    result.style.cssText = `
+        margin-top:20px;
+        padding:24px;
+        border-radius:20px;
+        background:var(--card-bg, #ffffff);
+        border:1px solid var(--border-color, #e1e7f0);
+        box-shadow:0 10px 35px rgba(0,0,0,.08);
+        line-height:1.75;
+        overflow:hidden;
+    `;
+
+    let formattedContent = String(
+        text || "No response"
+    );
+
+    /* Agar Premium Notes formatter available hai */
+    if (
+        typeof window.BharatBuddyPremiumNotes ===
+        "function"
+    ) {
+
+        formattedContent =
+            window.BharatBuddyPremiumNotes(
+                formattedContent,
+                curriculumState?.subject || "",
+                curriculumState?.chapter || ""
             );
 
-        if (old) old.remove();
+    } else {
 
-        const result =
-            document.createElement("div");
+        /* Basic Markdown fallback */
 
-        result.id =
-            "bbBoardAIResult";
+        formattedContent =
+            formattedContent
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                );
 
-        result.style.cssText = `
-            margin-top:20px;
-            padding:22px;
-            border-radius:18px;
-            background:#ffffff;
-            border:1px solid #e1e7f0;
-            box-shadow:0 8px 30px rgba(0,0,0,.06);
-            line-height:1.7;
-            white-space:pre-wrap;
-        `;
+        formattedContent =
+            formattedContent
+                .replace(
+                    /^### (.*)$/gm,
+                    "<h4>$1</h4>"
+                )
+                .replace(
+                    /^## (.*)$/gm,
+                    "<h3>$1</h3>"
+                )
+                .replace(
+                    /^# (.*)$/gm,
+                    "<h2>$1</h2>"
+                )
+                .replace(
+                    /\*\*(.*?)\*\*/g,
+                    "<strong>$1</strong>"
+                )
+                .replace(
+                    /`([^`]+)`/g,
+                    "<code>$1</code>"
+                )
+                .replace(
+                    /^\s*[-•]\s+(.*)$/gm,
+                    "<li>$1</li>"
+                )
+                .replace(
+                    /\n{2,}/g,
+                    "<br><br>"
+                )
+                .replace(
+                    /\n/g,
+                    "<br>"
+                );
+    }
 
-        result.innerHTML = `
-            <h2 style="margin-top:0;">
-                ${title}
+    result.innerHTML = `
+
+        <div style="
+            margin-bottom:22px;
+            padding-bottom:16px;
+            border-bottom:1px solid var(--border-color, #e5e7eb);
+        ">
+
+            <div style="
+                font-size:13px;
+                font-weight:700;
+                opacity:.65;
+                margin-bottom:5px;
+            ">
+                BHARATBUDDY AI
+            </div>
+
+            <h2 style="
+                margin:0;
+                font-size:26px;
+            ">
+                ${escapeHTML(String(title || "AI Result"))}
             </h2>
 
-            <div>
-                ${escapeHTML(String(text || "No response"))}
-            </div>
-        `;
+        </div>
 
-        pageContent.appendChild(result);
+        <div class="bb-ai-result-content">
+            ${formattedContent}
+        </div>
+    `;
 
-        result.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
-    }
+    pageContent.appendChild(result);
 
-
-    function escapeHTML(text) {
-
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
+    result.scrollIntoView({
+        behavior:"smooth",
+        block:"start"
+    });
+}
 
     /* =====================================================
        SAFE STUDY PAGE INTEGRATION
@@ -16852,5 +16986,883 @@ Return clean readable text.
 
 
     console.log("BharatBuddy Premium Study Notes UI loaded");
+
+})();
+/* =========================================================
+   BHARATBUDDY - TODAY'S MISSION
+   SAFE ADD-ON
+========================================================= */
+
+(function () {
+
+    "use strict";
+
+    function getTodayKey() {
+        const d = new Date();
+        return (
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0")
+        );
+    }
+
+    function getMissionData() {
+
+        const key = "bharatbuddy_today_mission";
+
+        let data;
+
+        try {
+            data = JSON.parse(
+                localStorage.getItem(key)
+            );
+        } catch (e) {
+            data = null;
+        }
+
+        if (
+            !data ||
+            data.date !== getTodayKey()
+        ) {
+
+            data = {
+                date: getTodayKey(),
+                completed: [],
+                xp: 0
+            };
+
+            localStorage.setItem(
+                key,
+                JSON.stringify(data)
+            );
+        }
+
+        return data;
+    }
+
+    function saveMissionData(data) {
+
+        localStorage.setItem(
+            "bharatbuddy_today_mission",
+            JSON.stringify(data)
+        );
+    }
+
+    function completeMission(id, xp) {
+
+        const data = getMissionData();
+
+        if (data.completed.includes(id)) {
+            return;
+        }
+
+        data.completed.push(id);
+        data.xp += xp;
+
+        saveMissionData(data);
+
+        renderMission();
+
+        if (
+            typeof showToast === "function"
+        ) {
+            showToast(
+                `🎉 Mission complete! +${xp} XP`
+            );
+        }
+    }
+
+    function renderMission() {
+
+        const pageContent =
+            document.getElementById(
+                "pageContent"
+            );
+
+        if (!pageContent) return;
+
+        const data = getMissionData();
+
+        const missions = [
+
+            {
+                id: "learn",
+                icon: "📚",
+                title: "Learn Something",
+                description:
+                    "Study one lesson for 10 minutes.",
+                xp: 20
+            },
+
+            {
+                id: "quiz",
+                icon: "🧠",
+                title: "Quick Quiz",
+                description:
+                    "Answer 5 practice questions.",
+                xp: 30
+            },
+
+            {
+                id: "explore",
+                icon: "💡",
+                title: "Explore",
+                description:
+                    "Ask BharatBuddy one useful doubt.",
+                xp: 20
+            }
+
+        ];
+
+        const completedCount =
+            data.completed.length;
+
+        const progress =
+            Math.round(
+                (completedCount / missions.length) *
+                100
+            );
+
+        const cards =
+            missions.map(function (mission) {
+
+                const completed =
+                    data.completed.includes(
+                        mission.id
+                    );
+
+                return `
+
+                    <div
+                        class="bb-mission-card
+                        ${completed ? "completed" : ""}"
+                        data-mission-id="${mission.id}"
+                        data-mission-xp="${mission.xp}"
+                    >
+
+                        <div class="bb-mission-icon">
+                            ${mission.icon}
+                        </div>
+
+                        <div class="bb-mission-info">
+
+                            <div class="bb-mission-title">
+                                ${mission.title}
+                            </div>
+
+                            <div class="bb-mission-description">
+                                ${mission.description}
+                            </div>
+
+                        </div>
+
+                        <div class="bb-mission-xp">
+                            ${completed
+                                ? "✓ Done"
+                                : "+" + mission.xp + " XP"}
+                        </div>
+
+                    </div>
+                `;
+            }).join("");
+
+        const existing =
+            document.getElementById(
+                "bbTodayMission"
+            );
+
+        if (existing) {
+            existing.remove();
+        }
+
+        const section =
+            document.createElement("div");
+
+        section.id =
+            "bbTodayMission";
+
+        section.innerHTML = `
+
+            <div class="bb-mission-header">
+
+                <div>
+
+                    <div class="bb-mission-label">
+                        🎯 TODAY'S MISSION
+                    </div>
+
+                    <h2>
+                        Aaj kya seekhenge?
+                    </h2>
+
+                    <p>
+                        Chhote steps. Better learning. 🚀
+                    </p>
+
+                </div>
+
+                <div class="bb-xp-box">
+
+                    <strong>
+                        ${data.xp}
+                    </strong>
+
+                    <span>XP</span>
+
+                </div>
+
+            </div>
+
+            <div class="bb-mission-progress">
+
+                <div class="bb-progress-top">
+
+                    <span>
+                        Daily Progress
+                    </span>
+
+                    <strong>
+                        ${progress}%
+                    </strong>
+
+                </div>
+
+                <div class="bb-progress-bar">
+
+                    <div
+                        style="width:${progress}%"
+                    ></div>
+
+                </div>
+
+            </div>
+
+            <div class="bb-mission-list">
+
+                ${cards}
+
+            </div>
+
+            ${
+                completedCount === missions.length
+                    ? `
+                        <div class="bb-mission-complete">
+                            🏆 Amazing! Aaj ke saare missions complete!
+                        </div>
+                    `
+                    : ""
+            }
+
+        `;
+
+        pageContent.prepend(section);
+
+        section
+            .querySelectorAll(
+                ".bb-mission-card"
+            )
+            .forEach(function (card) {
+
+                card.addEventListener(
+                    "click",
+                    function () {
+
+                        const id =
+                            this.dataset.missionId;
+
+                        const xp =
+                            Number(
+                                this.dataset.missionXp
+                            );
+
+                        completeMission(
+                            id,
+                            xp
+                        );
+
+                    }
+                );
+
+            });
+    }
+
+    function addMissionCSS() {
+
+        if (
+            document.getElementById(
+                "bbMissionCSS"
+            )
+        ) return;
+
+        const style =
+            document.createElement("style");
+
+        style.id =
+            "bbMissionCSS";
+
+        style.textContent = `
+
+            #bbTodayMission {
+                margin-bottom:24px;
+            }
+
+            .bb-mission-header {
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                gap:20px;
+                padding:26px;
+                border-radius:24px;
+                background:
+                    linear-gradient(
+                        135deg,
+                        #eef4ff,
+                        #f8fbff
+                    );
+                border:1px solid #dce6f5;
+                margin-bottom:16px;
+            }
+
+            .bb-mission-label {
+                font-size:12px;
+                font-weight:800;
+                letter-spacing:1px;
+                color:#4169e1;
+                margin-bottom:7px;
+            }
+
+            .bb-mission-header h2 {
+                margin:0;
+                font-size:28px;
+            }
+
+            .bb-mission-header p {
+                margin:6px 0 0;
+                opacity:.7;
+            }
+
+            .bb-xp-box {
+                min-width:75px;
+                text-align:center;
+                padding:14px;
+                border-radius:18px;
+                background:#ffffff;
+                box-shadow:0 8px 25px rgba(0,0,0,.07);
+            }
+
+            .bb-xp-box strong {
+                display:block;
+                font-size:26px;
+            }
+
+            .bb-xp-box span {
+                font-size:12px;
+                font-weight:700;
+                opacity:.6;
+            }
+
+            .bb-mission-progress {
+                padding:18px;
+                border-radius:18px;
+                background:#ffffff;
+                border:1px solid #e4e9f1;
+                margin-bottom:16px;
+            }
+
+            .bb-progress-top {
+                display:flex;
+                justify-content:space-between;
+                margin-bottom:10px;
+                font-size:14px;
+            }
+
+            .bb-progress-bar {
+                height:10px;
+                background:#e9edf3;
+                border-radius:20px;
+                overflow:hidden;
+            }
+
+            .bb-progress-bar div {
+                height:100%;
+                background:linear-gradient(
+                    90deg,
+                    #4169e1,
+                    #7c5cff
+                );
+                border-radius:20px;
+                transition:width .4s ease;
+            }
+
+            .bb-mission-list {
+                display:grid;
+                gap:12px;
+            }
+
+            .bb-mission-card {
+                display:flex;
+                align-items:center;
+                gap:15px;
+                padding:18px;
+                border-radius:18px;
+                background:#ffffff;
+                border:1px solid #e3e8f0;
+                cursor:pointer;
+                transition:
+                    transform .2s ease,
+                    box-shadow .2s ease;
+            }
+
+            .bb-mission-card:hover {
+                transform:translateY(-2px);
+                box-shadow:
+                    0 10px 25px rgba(0,0,0,.08);
+            }
+
+            .bb-mission-card.completed {
+                opacity:.65;
+                cursor:default;
+            }
+
+            .bb-mission-icon {
+                width:48px;
+                height:48px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border-radius:15px;
+                background:#f0f4ff;
+                font-size:23px;
+                flex-shrink:0;
+            }
+
+            .bb-mission-info {
+                flex:1;
+            }
+
+            .bb-mission-title {
+                font-weight:800;
+                margin-bottom:3px;
+            }
+
+            .bb-mission-description {
+                font-size:13px;
+                opacity:.65;
+            }
+
+            .bb-mission-xp {
+                font-size:13px;
+                font-weight:800;
+                white-space:nowrap;
+            }
+
+            .bb-mission-complete {
+                margin-top:16px;
+                padding:18px;
+                text-align:center;
+                border-radius:18px;
+                background:#eefaf1;
+                border:1px solid #ccebd3;
+                font-weight:800;
+            }
+
+            @media (max-width:600px) {
+
+                .bb-mission-header {
+                    padding:20px;
+                }
+
+                .bb-mission-header h2 {
+                    font-size:22px;
+                }
+
+                .bb-mission-card {
+                    padding:14px;
+                }
+
+                .bb-mission-xp {
+                    font-size:11px;
+                }
+
+            }
+
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    function initMission() {
+
+    addMissionCSS();
+
+    setTimeout(function () {
+
+        const pageContent =
+            document.getElementById("pageContent");
+
+        if (
+            pageContent &&
+            typeof renderMission === "function"
+        ) {
+            renderMission();
+        }
+
+    }, 300);
+}
+
+        }
+    );
+
+/* =========================================================
+   BHARATBUDDY - XP + DAILY STREAK
+   SAFE ADD-ON
+========================================================= */
+
+(function () {
+
+    "use strict";
+
+    const XP_KEY = "bharatbuddy_xp_system";
+
+    function getXPData() {
+
+        let data = null;
+
+        try {
+            data = JSON.parse(
+                localStorage.getItem(XP_KEY)
+            );
+        } catch (error) {
+            data = null;
+        }
+
+        if (!data) {
+
+            data = {
+                xp: 0,
+                streak: 0,
+                lastActiveDate: ""
+            };
+
+            localStorage.setItem(
+                XP_KEY,
+                JSON.stringify(data)
+            );
+        }
+
+        return data;
+    }
+
+    function saveXPData(data) {
+
+        localStorage.setItem(
+            XP_KEY,
+            JSON.stringify(data)
+        );
+    }
+
+    function today() {
+
+        const d = new Date();
+
+        return (
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0")
+        );
+    }
+
+    function yesterday() {
+
+        const d = new Date();
+
+        d.setDate(
+            d.getDate() - 1
+        );
+
+        return (
+            d.getFullYear() +
+            "-" +
+            String(d.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(d.getDate()).padStart(2, "0")
+        );
+    }
+
+    function updateStreak() {
+
+        const data = getXPData();
+
+        const current =
+            today();
+
+        if (
+            data.lastActiveDate === current
+        ) {
+            return data;
+        }
+
+        if (
+            data.lastActiveDate === yesterday()
+        ) {
+
+            data.streak =
+                Math.max(
+                    1,
+                    data.streak + 1
+                );
+
+        } else {
+
+            data.streak = 1;
+        }
+
+        data.lastActiveDate =
+            current;
+
+        saveXPData(data);
+
+        return data;
+    }
+
+    function addXP(amount) {
+
+        const data =
+            updateStreak();
+
+        data.xp += Number(amount) || 0;
+
+        saveXPData(data);
+
+        return data;
+    }
+
+    function createXPCard() {
+
+        const home =
+            document.getElementById(
+                "pageContent"
+            );
+
+        if (!home) return;
+
+        const old =
+            document.getElementById(
+                "bbXPCard"
+            );
+
+        if (old) old.remove();
+
+        const data =
+            updateStreak();
+
+        const card =
+            document.createElement("div");
+
+        card.id =
+            "bbXPCard";
+
+        card.innerHTML = `
+
+            <div class="bb-xp-main">
+
+                <div class="bb-xp-icon">
+                    ⚡
+                </div>
+
+                <div>
+
+                    <div class="bb-xp-label">
+                        YOUR LEARNING XP
+                    </div>
+
+                    <div class="bb-xp-number">
+                        ${data.xp} XP
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="bb-streak-box">
+
+                <div class="bb-fire">
+                    🔥
+                </div>
+
+                <div>
+
+                    <strong>
+                        ${data.streak}
+                    </strong>
+
+                    <span>
+                        Day Streak
+                    </span>
+
+                </div>
+
+            </div>
+        `;
+
+        home.prepend(card);
+    }
+
+    function addXPStyle() {
+
+        if (
+            document.getElementById(
+                "bbXPStyle"
+            )
+        ) return;
+
+        const style =
+            document.createElement("style");
+
+        style.id =
+            "bbXPStyle";
+
+        style.textContent = `
+
+            #bbXPCard {
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                gap:20px;
+                padding:20px;
+                margin-bottom:18px;
+                border-radius:22px;
+                background:
+                    linear-gradient(
+                        135deg,
+                        #fff7e6,
+                        #ffffff
+                    );
+                border:1px solid #f0dfb8;
+                box-shadow:
+                    0 8px 28px rgba(0,0,0,.06);
+            }
+
+            .bb-xp-main {
+                display:flex;
+                align-items:center;
+                gap:14px;
+            }
+
+            .bb-xp-icon {
+                width:52px;
+                height:52px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border-radius:16px;
+                background:#fff0c7;
+                font-size:25px;
+            }
+
+            .bb-xp-label {
+                font-size:11px;
+                font-weight:800;
+                letter-spacing:1px;
+                opacity:.55;
+            }
+
+            .bb-xp-number {
+                font-size:24px;
+                font-weight:900;
+                margin-top:3px;
+            }
+
+            .bb-streak-box {
+                display:flex;
+                align-items:center;
+                gap:10px;
+                padding:10px 16px;
+                border-radius:16px;
+                background:#fff;
+                border:1px solid #eee4d0;
+            }
+
+            .bb-fire {
+                font-size:25px;
+            }
+
+            .bb-streak-box strong {
+                display:block;
+                font-size:20px;
+            }
+
+            .bb-streak-box span {
+                display:block;
+                font-size:11px;
+                opacity:.6;
+                font-weight:700;
+            }
+
+            @media (max-width:600px) {
+
+                #bbXPCard {
+                    padding:16px;
+                }
+
+                .bb-xp-number {
+                    font-size:20px;
+                }
+
+                .bb-streak-box {
+                    padding:8px 10px;
+                }
+
+            }
+
+        `;
+
+        document.head.appendChild(style);
+    }
+
+    function initXPSystem() {
+
+        addXPStyle();
+
+        setTimeout(
+            createXPCard,
+            500
+        );
+    }
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initXPSystem
+    );
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const homeButton =
+                event.target.closest(
+                    '[data-page="home"]'
+                );
+
+            if (homeButton) {
+
+                setTimeout(
+                    createXPCard,
+                    400
+                );
+            }
+
+        }
+    );
+
+    window.BharatBuddyXP = {
+        getData: getXPData,
+        addXP: addXP,
+        updateStreak: updateStreak
+    };
 
 })();
