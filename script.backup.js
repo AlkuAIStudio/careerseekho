@@ -1,4 +1,137 @@
+<<<<<<< HEAD
+// ================================
+// CAREERSEEKHO WEBSITE JAVASCRIPT
+// ================================
 
+// MOBILE MENU
+const menuBtn = document.getElementById("menuBtn");
+const navLinks = document.querySelector(".nav-links");
+
+if (menuBtn && navLinks) {
+  menuBtn.addEventListener("click", () => {
+    navLinks.classList.toggle("mobile-active");
+
+    const icon = menuBtn.querySelector("i");
+
+    if (navLinks.classList.contains("mobile-active")) {
+      icon.classList.remove("fa-bars");
+      icon.classList.add("fa-xmark");
+    } else {
+      icon.classList.remove("fa-xmark");
+      icon.classList.add("fa-bars");
+    }
+  });
+}
+
+
+// CLOSE MOBILE MENU AFTER CLICKING A LINK
+const navItems = document.querySelectorAll(".nav-links a");
+
+navItems.forEach((item) => {
+  item.addEventListener("click", () => {
+    if (navLinks) {
+      navLinks.classList.remove("mobile-active");
+    }
+
+    const icon = menuBtn?.querySelector("i");
+
+    if (icon) {
+      icon.classList.remove("fa-xmark");
+      icon.classList.add("fa-bars");
+    }
+  });
+});
+
+
+// ACTIVE NAVIGATION LINK ON SCROLL
+const sections = document.querySelectorAll("main section[id]");
+
+window.addEventListener("scroll", () => {
+  let currentSection = "";
+
+  sections.forEach((section) => {
+    const sectionTop = section.offsetTop - 150;
+    const sectionHeight = section.offsetHeight;
+
+    if (
+      window.scrollY >= sectionTop &&
+      window.scrollY < sectionTop + sectionHeight
+    ) {
+      currentSection = section.getAttribute("id");
+    }
+  });
+
+  navItems.forEach((item) => {
+    item.classList.remove("active");
+
+    const href = item.getAttribute("href");
+
+    if (href === `#${currentSection}`) {
+      item.classList.add("active");
+    }
+  });
+});
+
+
+// NAVBAR SHADOW ON SCROLL
+const navbar = document.querySelector(".navbar");
+
+window.addEventListener("scroll", () => {
+  if (navbar) {
+    if (window.scrollY > 20) {
+      navbar.classList.add("scrolled");
+    } else {
+      navbar.classList.remove("scrolled");
+    }
+  }
+});
+
+
+// SCROLL REVEAL ANIMATION
+const revealElements = document.querySelectorAll(
+  ".topic-card, .video-card, .section-heading, .alku-section"
+);
+
+revealElements.forEach((element) => {
+  element.classList.add("reveal");
+});
+
+const revealOnScroll = () => {
+  const windowHeight = window.innerHeight;
+
+  revealElements.forEach((element) => {
+    const elementTop = element.getBoundingClientRect().top;
+
+    if (elementTop < windowHeight - 80) {
+      element.classList.add("show");
+    }
+  });
+};
+
+window.addEventListener("scroll", revealOnScroll);
+window.addEventListener("load", revealOnScroll);
+
+
+// OPTIONAL: SMOOTH SCROLL FOR INTERNAL LINKS
+document.querySelectorAll('a[href^="#"]').forEach((link) => {
+  link.addEventListener("click", (event) => {
+    const targetId = link.getAttribute("href");
+
+    if (targetId === "#") return;
+
+    const target = document.querySelector(targetId);
+
+    if (target) {
+      event.preventDefault();
+
+      target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+  });
+});
+=======
 "use strict";
 
 /* ============================================================
@@ -2064,12 +2197,13 @@ const QUIZ_TIME = 60;
 let currentCodeTab = "html";
 
 let studyState = {
-    board: "CBSE",
-    className: "Class 11",
-    stream: "PCM",
+
     subject: "Physics",
-    chapter: "",
+
+    chapter: "Units & Measurements",
+
     lessonIndex: 0
+
 };
 
 let activeChapterTest = null;
@@ -3483,29 +3617,39 @@ async function sendTutorMessage() {
    STUDY HELPERS
    ============================================================ */
 
-function getAllLessons(subject) {
+function getAllLessons(
+    subject
+) {
 
-    const curriculumChapters =
-        getCurriculumChapters(subject);
+    const chapters =
+        lessonData[subject] || {};
+
 
     const lessons = [];
 
-    curriculumChapters.forEach(
-        (chapter, chapterIndex) => {
 
-            const chapterLessons =
-                getChapterLessons(
-                    subject,
-                    chapter
-                );
+    Object.entries(
+        chapters
+    )
+    .forEach(
+        (
+            [
+                chapter,
+                chapterLessons
+            ],
+            chapterIndex
+        ) => {
 
             chapterLessons.forEach(
-                (lesson, lessonIndex) => {
+                (
+                    lesson,
+                    lessonIndex
+                ) => {
 
                     lessons.push({
 
                         id:
-                            `${studyState.board}-${studyState.className}-${studyState.stream}-${subject}-${chapterIndex}-${lessonIndex}`,
+                            `${subject}-${chapterIndex}-${lessonIndex}`,
 
                         subject,
 
@@ -3529,84 +3673,63 @@ function getAllLessons(subject) {
         }
     );
 
+
     return lessons;
+
 }
+
+
 function getChapterLessons(
     subject,
     chapter
 ) {
 
-    // Existing lessonData me chapter hai
-    // to uska original content use karo.
-    if (
-        lessonData[subject]?.[chapter]
-    ) {
+    return (
+        lessonData[subject]?.[chapter] ||
+        []
+    );
 
-        return lessonData[
+}
+
+
+function calculateLessonProgress(
+    subject,
+    sourceData = data
+) {
+
+    const lessons =
+        getAllLessons(
             subject
-        ][
-            chapter
-        ];
+        );
+
+
+    if (!lessons.length) {
+
+        return 0;
 
     }
 
-    // Curriculum me chapter hai,
-    // lekin lessonData me content nahi hai.
-    // Filhaal chapter ko ek lesson ke roop me show karo.
-    if (
-        getCurriculumChapters(
-            subject
-        ).includes(
-            chapter
+
+    const completed =
+        Array.isArray(
+            sourceData.lessonProgress?.[subject]
         )
-    ) {
-
-        return [
-            {
-                title: chapter,
-
-                content: `
-                    <h3>
-                        📚 ${escapeHTML(chapter)}
-                    </h3>
-
-                    <p>
-                        Ye chapter
-                        <strong>
-                            ${escapeHTML(
-                                studyState.board
-                            )}
-                        </strong>
-                        curriculum ke according hai.
-                    </p>
-
-                    <p>
-                        🎓 ${escapeHTML(
-                            studyState.className
-                        )}
-                        ${
-                            studyState.stream
-                                ? `• ${escapeHTML(
-                                    studyState.stream
-                                )}`
-                                : ""
-                        }
-                    </p>
-
-                    <p>
-                        🤖 BharatBuddy is chapter ke
-                        detailed learning content ko
-                        prepare karega.
-                    </p>
-                `
-            }
-        ];
-
-    }
-
-    return [];
+            ? sourceData.lessonProgress[subject]
+            : [];
 
 
+    return Math.round(
+        (
+            completed.filter(
+                id =>
+                    lessons.some(
+                        lesson =>
+                            lesson.id === id
+                    )
+            ).length /
+            lessons.length
+        ) * 100
+    );
 
 }
 
@@ -3664,44 +3787,23 @@ function ensureStudyProgress() {
 
 /* ============================================================
    STUDY PAGE
-   CBSE + BSEB CURRICULUM
    ============================================================ */
 
 function renderStudy() {
 
     ensureStudyProgress();
 
-    /* --------------------------------------------------------
-       CURRICULUM DATA
-    -------------------------------------------------------- */
 
     const subjects =
-        getCurriculumSubjects();
+        Object.keys(
+            lessonData
+        );
 
-
-    if (!subjects.length) {
-
-        pageContent.innerHTML = `
-            <div class="card">
-                <h2>📚 Curriculum Not Found</h2>
-                <p style="margin-top:10px;">
-                    Please select a valid Board, Class and Stream.
-                </p>
-            </div>
-        `;
-
-        return;
-    }
-
-
-    /* --------------------------------------------------------
-       DEFAULT SUBJECT
-    -------------------------------------------------------- */
 
     if (
-        !subjects.includes(
+        !lessonData[
             studyState.subject
-        )
+        ]
     ) {
 
         studyState.subject =
@@ -3710,34 +3812,13 @@ function renderStudy() {
     }
 
 
-    /* --------------------------------------------------------
-       CURRICULUM CHAPTERS
-    -------------------------------------------------------- */
-
     const chapters =
-        getCurriculumChapters(
-            studyState.subject
+        Object.keys(
+            lessonData[
+                studyState.subject
+            ] || {}
         );
 
-
-    if (!chapters.length) {
-
-        pageContent.innerHTML = `
-            <div class="card">
-                <h2>📖 Chapters Not Found</h2>
-                <p style="margin-top:10px;">
-                    Is subject ke chapters curriculum me available nahi hain.
-                </p>
-            </div>
-        `;
-
-        return;
-    }
-
-
-    /* --------------------------------------------------------
-       DEFAULT CHAPTER
-    -------------------------------------------------------- */
 
     if (
         !chapters.includes(
@@ -3750,10 +3831,6 @@ function renderStudy() {
 
     }
 
-
-    /* --------------------------------------------------------
-       CHAPTER LESSONS
-    -------------------------------------------------------- */
 
     const chapterLessons =
         getChapterLessons(
@@ -3771,10 +3848,6 @@ function renderStudy() {
 
     }
 
-
-    /* --------------------------------------------------------
-       ALL LESSONS
-    -------------------------------------------------------- */
 
     const allLessons =
         getAllLessons(
@@ -3794,68 +3867,6 @@ function renderStudy() {
         );
 
 
-    /* --------------------------------------------------------
-       SUBJECT ICON
-    -------------------------------------------------------- */
-
-    function getSubjectIcon(subject) {
-
-        if (subject === "Physics")
-            return "⚡";
-
-        if (subject === "Mathematics")
-            return "📐";
-
-        if (subject === "Chemistry")
-            return "🧪";
-
-        if (subject === "Biology")
-            return "🧬";
-
-        if (subject === "Computer Science")
-            return "💻";
-
-        if (subject === "Accountancy")
-            return "📊";
-
-        if (subject === "Economics")
-            return "💰";
-
-        if (subject === "Business Studies")
-            return "💼";
-
-        if (subject === "History")
-            return "🏛️";
-
-        if (subject === "Geography")
-            return "🌍";
-
-        if (subject === "Political Science")
-            return "⚖️";
-
-        if (subject === "Sociology")
-            return "👥";
-
-        if (subject === "Science")
-            return "🔬";
-
-        if (subject === "English")
-            return "🇬🇧";
-
-        if (subject === "Hindi")
-            return "🇮🇳";
-
-        if (subject === "Social Science")
-            return "🌏";
-
-        return "📚";
-    }
-
-
-    /* ========================================================
-       PAGE
-       ======================================================== */
-
     pageContent.innerHTML = `
 
         <div class="page-header">
@@ -3865,176 +3876,15 @@ function renderStudy() {
             </h1>
 
             <p>
-                ${escapeHTML(
-                    studyState.board
-                )}
-                •
-                ${escapeHTML(
-                    studyState.className
-                )}
-                ${
-                    studyState.stream
-                        ? `• ${escapeHTML(
-                            studyState.stream
-                        )}`
-                        : ""
-                }
+                Textbook-style learning for your subjects.
             </p>
 
         </div>
 
 
-        <!-- ==================================================
-             CURRICULUM SELECTOR
-        ================================================== -->
-
-        <div class="card">
-
-            <h3>
-                🎓 Curriculum
-            </h3>
-
-            <div
-                class="grid-3"
-                style="margin-top:15px;"
-            >
-
-                <div class="form-group">
-
-                    <label class="form-label">
-                        Board
-                    </label>
-
-                    <select
-                        id="studyBoard"
-                        class="form-select">
-
-                        <option
-                            value="CBSE"
-                            ${
-                                studyState.board === "CBSE"
-                                    ? "selected"
-                                    : ""
-                            }>
-                            CBSE
-                        </option>
-
-                        <option
-                            value="BSEB"
-                            ${
-                                studyState.board === "BSEB"
-                                    ? "selected"
-                                    : ""
-                            }>
-                            BSEB
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label class="form-label">
-                        Class
-                    </label>
-
-                    <select
-                        id="studyClass"
-                        class="form-select">
-
-                        ${
-                            Object.keys(
-                                boardCurriculum[
-                                    studyState.board
-                                ] || {}
-                            )
-                            .map(
-                                className => `
-                                    <option
-                                        value="${escapeHTML(
-                                            className
-                                        )}"
-                                        ${
-                                            className ===
-                                            studyState.className
-                                                ? "selected"
-                                                : ""
-                                        }>
-                                        ${escapeHTML(
-                                            className
-                                        )}
-                                    </option>
-                                `
-                            )
-                            .join("")
-                        }
-
-                    </select>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label class="form-label">
-                        Stream
-                    </label>
-
-                    <select
-                        id="studyStream"
-                        class="form-select">
-
-                        ${
-                            Object.keys(
-                                boardCurriculum[
-                                    studyState.board
-                                ]?.[
-                                    studyState.className
-                                ]?.streams || {}
-                            )
-                            .map(
-                                stream => `
-                                    <option
-                                        value="${escapeHTML(
-                                            stream
-                                        )}"
-                                        ${
-                                            stream ===
-                                            studyState.stream
-                                                ? "selected"
-                                                : ""
-                                        }>
-                                        ${escapeHTML(
-                                            stream
-                                        )}
-                                    </option>
-                                `
-                            )
-                            .join("")
-                        }
-
-                    </select>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <br>
-
-
-        <!-- ==================================================
-             SUBJECTS
-        ================================================== -->
-
         <div class="grid-3">
 
-            ${
-                subjects
+            ${subjects
                 .map(
                     subject => {
 
@@ -4042,6 +3892,7 @@ function renderStudy() {
                             calculateLessonProgress(
                                 subject
                             );
+
 
                         return `
 
@@ -4058,9 +3909,17 @@ function renderStudy() {
                                         margin-bottom:10px;
                                     ">
 
-                                    ${getSubjectIcon(
-                                        subject
-                                    )}
+                                    ${
+                                        subject === "Physics"
+                                            ? "⚡"
+                                            : subject === "Mathematics"
+                                                ? "📐"
+                                                : subject === "Chemistry"
+                                                    ? "🧪"
+                                                    : subject === "Computer Science"
+                                                        ? "💻"
+                                                        : "🇬🇧"
+                                    }
 
                                 </div>
 
@@ -4080,18 +3939,13 @@ function renderStudy() {
 
                     }
                 )
-                .join("")
-            }
+                .join("")}
 
         </div>
 
 
         <br>
 
-
-        <!-- ==================================================
-             COURSE PROGRESS
-        ================================================== -->
 
         <div class="card">
 
@@ -4122,9 +3976,7 @@ function renderStudy() {
 
                 <div
                     class="progress-bar"
-                    style="
-                        width:${subjectProgress}%
-                    ">
+                    style="width:${subjectProgress}%">
                 </div>
 
             </div>
@@ -4135,26 +3987,21 @@ function renderStudy() {
         <br>
 
 
-        <!-- ==================================================
-             CHAPTER
-        ================================================== -->
-
         <div class="card">
 
             <div class="form-group">
 
                 <label class="form-label">
-                    📖 Select Chapter
+                    Select Chapter
                 </label>
 
                 <select
                     id="studyChapter"
                     class="form-select">
 
-                    ${
-                        chapters
+                    ${chapters
                         .map(
-                            (chapter, index) => `
+                            chapter => `
 
                                 <option
                                     value="${escapeHTML(
@@ -4167,9 +4014,6 @@ function renderStudy() {
                                             : ""
                                     }>
 
-                                    Chapter ${
-                                        index + 1
-                                    } — 
                                     ${escapeHTML(
                                         chapter
                                     )}
@@ -4178,8 +4022,7 @@ function renderStudy() {
 
                             `
                         )
-                        .join("")
-                    }
+                        .join("")}
 
                 </select>
 
@@ -4187,8 +4030,6 @@ function renderStudy() {
 
 
             <div class="grid-2">
-
-                <!-- CHAPTER TOPICS -->
 
                 <div>
 
@@ -4202,81 +4043,70 @@ function renderStudy() {
                             display:flex;
                             flex-direction:column;
                             gap:8px;
-                        "
-                    >
+                        ">
 
-                        ${
-                            chapterLessons.length
-                                ? chapterLessons
-                                    .map(
-                                        (
-                                            lesson,
-                                            index
-                                        ) => {
+                        ${chapterLessons
+                            .map(
+                                (
+                                    lesson,
+                                    index
+                                ) => {
 
-                                            const allLesson =
-                                                allLessons.find(
-                                                    item =>
-                                                        item.subject ===
-                                                            studyState.subject &&
-                                                        item.chapter ===
-                                                            studyState.chapter &&
-                                                        item.lessonIndex ===
-                                                            index
-                                                );
+                                    const allLesson =
+                                        allLessons.find(
+                                            item =>
+                                                item.subject ===
+                                                    studyState.subject &&
+                                                item.chapter ===
+                                                    studyState.chapter &&
+                                                item.lessonIndex ===
+                                                    index
+                                        );
 
 
-                                            const done =
-                                                allLesson &&
-                                                completed.includes(
-                                                    allLesson.id
-                                                );
+                                    const done =
+                                        allLesson &&
+                                        completed.includes(
+                                            allLesson.id
+                                        );
 
 
-                                            return `
+                                    return `
 
-                                                <button
-                                                    type="button"
-                                                    class="btn ${
-                                                        index ===
-                                                        studyState.lessonIndex
-                                                            ? "btn-primary"
-                                                            : "btn-secondary"
-                                                    } study-lesson-btn"
-                                                    data-lesson-index="${index}"
-                                                    style="text-align:left;">
+                                        <button
+                                            type="button"
+                                            class="btn ${
+                                                index ===
+                                                studyState.lessonIndex
+                                                    ? "btn-primary"
+                                                    : "btn-secondary"
+                                            } study-lesson-btn"
+                                            data-lesson-index="${index}"
+                                            style="text-align:left;">
 
-                                                    ${
-                                                        done
-                                                            ? "✅"
-                                                            : "📖"
-                                                    }
+                                            ${
+                                                done
+                                                    ? "✅"
+                                                    : "📖"
+                                            }
 
-                                                    ${index + 1}.
-                                                    ${escapeHTML(
-                                                        lesson.title
-                                                    )}
+                                            ${index + 1}.
+                                            ${escapeHTML(
+                                                lesson.title
+                                            )}
 
-                                                </button>
+                                        </button>
 
-                                            `;
+                                    `;
 
-                                        }
-                                    )
-                                    .join("")
-                                : `
-                                    <p>
-                                        Is chapter ka lesson abhi available nahi hai.
-                                    </p>
-                                `
-                        }
+                                }
+                            )
+                            .join("")}
 
                     </div>
 
                 </div>
 
-
-                <!-- CHAPTER TEST -->
 
                 <div>
 
@@ -4288,14 +4118,12 @@ function renderStudy() {
                         style="
                             margin-top:10px;
                             opacity:.75;
-                        "
-                    >
+                        ">
 
                         Chapter ke lessons complete karne ke
-                        baad isi chapter ke questions attempt karo.
+                        baad textbook-style questions attempt karo.
 
                     </p>
-
 
                     <button
                         class="btn btn-primary"
@@ -4321,218 +4149,58 @@ function renderStudy() {
     `;
 
 
-    /* ========================================================
-       EVENTS
-    ======================================================== */
-
     attachStudyEvents();
 
     renderCurrentLesson();
 
 }
 
-/* ============================================================
-   STUDY EVENTS
-   CBSE + BSEB CURRICULUM
-   ============================================================ */
 
 function attachStudyEvents() {
 
-    /* --------------------------------------------------------
-       BOARD
-    -------------------------------------------------------- */
-
-    const board =
-        document.getElementById("studyBoard");
-
-    if (board) {
-
-        board.addEventListener(
-            "change",
-            () => {
-
-                studyState.board =
-                    board.value;
-
-                const classes =
-                    Object.keys(
-                        boardCurriculum[
-                            studyState.board
-                        ] || {}
-                    );
-
-                studyState.className =
-                    classes[0] || "Class 11";
-
-                const streams =
-                    Object.keys(
-                        boardCurriculum[
-                            studyState.board
-                        ]?.[
-                            studyState.className
-                        ]?.streams || {}
-                    );
-
-                studyState.stream =
-                    streams[0] || "";
-
-                const subjects =
-                    getCurriculumSubjects();
-
-                studyState.subject =
-                    subjects[0] || "";
-
-                const chapters =
-                    getCurriculumChapters(
-                        studyState.subject
-                    );
-
-                studyState.chapter =
-                    chapters[0] || "";
-
-                studyState.lessonIndex = 0;
-
-                renderStudy();
-
-            }
-        );
-
-    }
-
-
-    /* --------------------------------------------------------
-       CLASS
-    -------------------------------------------------------- */
-
-    const classSelect =
-        document.getElementById("studyClass");
-
-    if (classSelect) {
-
-        classSelect.addEventListener(
-            "change",
-            () => {
-
-                studyState.className =
-                    classSelect.value;
-
-                const streams =
-                    Object.keys(
-                        boardCurriculum[
-                            studyState.board
-                        ]?.[
-                            studyState.className
-                        ]?.streams || {}
-                    );
-
-                studyState.stream =
-                    streams[0] || "";
-
-                const subjects =
-                    getCurriculumSubjects();
-
-                studyState.subject =
-                    subjects[0] || "";
-
-                const chapters =
-                    getCurriculumChapters(
-                        studyState.subject
-                    );
-
-                studyState.chapter =
-                    chapters[0] || "";
-
-                studyState.lessonIndex = 0;
-
-                renderStudy();
-
-            }
-        );
-
-    }
-
-
-    /* --------------------------------------------------------
-       STREAM
-    -------------------------------------------------------- */
-
-    const stream =
-        document.getElementById("studyStream");
-
-    if (stream) {
-
-        stream.addEventListener(
-            "change",
-            () => {
-
-                studyState.stream =
-                    stream.value;
-
-                const subjects =
-                    getCurriculumSubjects();
-
-                studyState.subject =
-                    subjects[0] || "";
-
-                const chapters =
-                    getCurriculumChapters(
-                        studyState.subject
-                    );
-
-                studyState.chapter =
-                    chapters[0] || "";
-
-                studyState.lessonIndex = 0;
-
-                renderStudy();
-
-            }
-        );
-
-    }
-
-
-    /* --------------------------------------------------------
-       SUBJECT
-    -------------------------------------------------------- */
-
     document
-        .querySelectorAll("[data-subject]")
-        .forEach(button => {
+        .querySelectorAll(
+            "[data-subject]"
+        )
+        .forEach(
+            button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+                button.addEventListener(
+                    "click",
+                    () => {
 
-                    studyState.subject =
-                        button.dataset.subject;
+                        studyState.subject =
+                            button.dataset.subject;
 
-                    const chapters =
-                        getCurriculumChapters(
-                            studyState.subject
-                        );
-
-                    studyState.chapter =
-                        chapters[0] || "";
-
-                    studyState.lessonIndex = 0;
-
-                    renderStudy();
-
-                }
-            );
-
-        });
+                        const chapters =
+                            Object.keys(
+                                lessonData[
+                                    studyState.subject
+                                ]
+                            );
 
 
-    /* --------------------------------------------------------
-       CHAPTER
-    -------------------------------------------------------- */
+                        studyState.chapter =
+                            chapters[0];
+
+                        studyState.lessonIndex =
+                            0;
+
+
+                        renderStudy();
+
+                    }
+                );
+
+            }
+        );
+
 
     const chapter =
         document.getElementById(
             "studyChapter"
         );
+
 
     if (chapter) {
 
@@ -4543,7 +4211,8 @@ function attachStudyEvents() {
                 studyState.chapter =
                     chapter.value;
 
-                studyState.lessonIndex = 0;
+                studyState.lessonIndex =
+                    0;
 
                 renderStudy();
 
@@ -4553,41 +4222,38 @@ function attachStudyEvents() {
     }
 
 
-    /* --------------------------------------------------------
-       LESSON
-    -------------------------------------------------------- */
-
     document
-        .querySelectorAll(".study-lesson-btn")
-        .forEach(button => {
+        .querySelectorAll(
+            ".study-lesson-btn"
+        )
+        .forEach(
+            button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+                button.addEventListener(
+                    "click",
+                    () => {
 
-                    studyState.lessonIndex =
-                        Number(
-                            button.dataset.lessonIndex
-                        );
+                        studyState.lessonIndex =
+                            Number(
+                                button.dataset.lessonIndex
+                            );
 
-                    renderCurrentLesson();
+                        renderCurrentLesson();
 
-                    scrollToCurrentLesson();
+                        scrollToCurrentLesson();
 
-                }
-            );
+                    }
+                );
 
-        });
+            }
+        );
 
-
-    /* --------------------------------------------------------
-       CHAPTER TEST
-    -------------------------------------------------------- */
 
     const testButton =
         document.getElementById(
             "chapterTestButton"
         );
+
 
     if (testButton) {
 
@@ -4600,6 +4266,449 @@ function attachStudyEvents() {
 
 }
 
+
+function renderCurrentLesson() {
+
+    const area =
+        document.getElementById(
+            "currentLessonArea"
+        );
+
+
+    if (!area) return;
+
+
+    const lessons =
+        getChapterLessons(
+            studyState.subject,
+            studyState.chapter
+        );
+
+
+    const lesson =
+        lessons[
+            studyState.lessonIndex
+        ];
+
+
+    if (!lesson) {
+
+        return;
+
+    }
+
+
+    const allLessons =
+        getAllLessons(
+            studyState.subject
+        );
+
+
+    const currentGlobalIndex =
+        allLessons.findIndex(
+            item =>
+                item.subject ===
+                    studyState.subject &&
+                item.chapter ===
+                    studyState.chapter &&
+                item.lessonIndex ===
+                    studyState.lessonIndex
+        );
+
+
+    const progress =
+        allLessons.length
+            ? Math.round(
+                (
+                    (currentGlobalIndex + 1) /
+                    allLessons.length
+                ) * 100
+            )
+            : 0;
+
+
+    const lessonId =
+        `${studyState.subject}-${Object.keys(
+            lessonData[
+                studyState.subject
+            ]
+        ).indexOf(
+            studyState.chapter
+        )}-${studyState.lessonIndex}`;
+
+
+    const isCompleted =
+        data.lessonProgress[
+            studyState.subject
+        ]?.includes(
+            lessonId
+        );
+
+
+    const isLast =
+        studyState.lessonIndex >=
+        lessons.length - 1;
+
+
+    area.innerHTML = `
+
+        <div class="card">
+
+            <div class="course-top">
+
+                <div>
+
+                    <small>
+                        ${escapeHTML(
+                            studyState.chapter
+                        )}
+                    </small>
+
+                    <h2
+                        style="margin-top:6px;">
+
+                        ${escapeHTML(
+                            lesson.title
+                        )}
+
+                    </h2>
+
+                </div>
+
+                <strong>
+                    ${studyState.lessonIndex + 1}
+                    /
+                    ${lessons.length}
+                </strong>
+
+            </div>
+
+
+            <div
+                class="progress"
+                style="margin:16px 0;">
+
+                <div
+                    class="progress-bar"
+                    style="width:${progress}%">
+                </div>
+
+            </div>
+
+
+            <article
+                class="lesson-content"
+                style="
+                    line-height:1.8;
+                    font-size:16px;
+                ">
+
+                ${lesson.content}
+
+            </article>
+
+
+            <div
+                class="card"
+                style="margin-top:22px;">
+
+                <h3>
+                    💡 Important Points
+                </h3>
+
+                <ul
+                    style="
+                        margin-top:10px;
+                        line-height:1.8;
+                    ">
+
+                    <li>
+                        Concept ko examples ke saath samjho.
+                    </li>
+
+                    <li>
+                        Important definitions aur formulas revise karo.
+                    </li>
+
+                    <li>
+                        Chapter exercise attempt karo.
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                    gap:10px;
+                    margin-top:20px;
+                    flex-wrap:wrap;
+                ">
+
+                <button
+                    class="btn btn-secondary"
+                    id="previousLesson"
+                    ${
+                        studyState.lessonIndex === 0
+                            ? "disabled"
+                            : ""
+                    }>
+
+                    ← Previous
+
+                </button>
+
+
+                <button
+                    class="btn btn-primary"
+                    id="completeLesson">
+
+                    ${
+                        isCompleted
+                            ? "✅ Completed"
+                            : "✅ Mark Lesson Complete"
+                    }
+
+                </button>
+
+
+                <button
+                    class="btn btn-primary"
+                    id="nextLesson">
+
+                    ${
+                        isLast
+                            ? "Chapter Exercise →"
+                            : "Next Topic →"
+                    }
+
+                </button>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    const previous =
+        document.getElementById(
+            "previousLesson"
+        );
+
+
+    const complete =
+        document.getElementById(
+            "completeLesson"
+        );
+
+
+    const next =
+        document.getElementById(
+            "nextLesson"
+        );
+
+
+    if (previous) {
+
+        previous.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    studyState.lessonIndex >
+                    0
+                ) {
+
+                    studyState.lessonIndex--;
+
+                    renderStudy();
+
+                    scrollToCurrentLesson();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (complete) {
+
+        complete.addEventListener(
+            "click",
+            () => {
+
+                completeCurrentLesson();
+
+            }
+        );
+
+    }
+
+
+    if (next) {
+
+        next.addEventListener(
+            "click",
+            () => {
+
+                if (isLast) {
+
+                    startChapterTest();
+
+                } else {
+
+                    completeCurrentLesson(
+                        false,
+                        true
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+}
+
+
+function completeCurrentLesson(
+    finishCourse = false,
+    goNext = false
+) {
+
+    const subject =
+        studyState.subject;
+
+
+    const lessons =
+        getChapterLessons(
+            subject,
+            studyState.chapter
+        );
+
+
+    const chapterIndex =
+        Object.keys(
+            lessonData[
+                subject
+            ]
+        ).indexOf(
+            studyState.chapter
+        );
+
+
+    const lessonId =
+        `${subject}-${chapterIndex}-${studyState.lessonIndex}`;
+
+
+    if (
+        !data.lessonProgress[
+            subject
+        ].includes(
+            lessonId
+        )
+    ) {
+
+        data.lessonProgress[
+            subject
+        ].push(
+            lessonId
+        );
+
+
+        data.stats.lessons++;
+
+
+        data.dailyGoal =
+            Math.min(
+                data.dailyGoalTarget,
+                data.dailyGoal + 1
+            );
+
+
+        showToast(
+            "Lesson complete! 🎉"
+        );
+
+    }
+
+
+    const progress =
+        calculateLessonProgress(
+            subject
+        );
+
+
+    const progressSubject =
+        normalizeProgressSubject(
+            subject
+        );
+
+
+    if (
+        progressSubject in
+        data.progress
+    ) {
+
+        data.progress[
+            progressSubject
+        ] = progress;
+
+    }
+
+
+    saveData();
+
+
+    if (
+        goNext &&
+        studyState.lessonIndex <
+            lessons.length - 1
+    ) {
+
+        studyState.lessonIndex++;
+
+    }
+
+
+    renderStudy();
+
+
+    setTimeout(
+        scrollToCurrentLesson,
+        100
+    );
+
+}
+
+
+function scrollToCurrentLesson() {
+
+    const area =
+        document.getElementById(
+            "currentLessonArea"
+        );
+
+
+    if (area) {
+
+        area.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+
+}
+
+
 /* ============================================================
    CHAPTER TEST
    ============================================================ */
@@ -4609,86 +4718,72 @@ function getChapterQuestions() {
     const key =
         `${studyState.subject}|${studyState.chapter}`;
 
-    /* Existing chapter questions */
 
-    if (chapterQuestions[key]) {
+    if (
+        chapterQuestions[key]
+    ) {
+
         return chapterQuestions[key];
+
     }
 
-    /* Curriculum chapter ke liye fallback */
-
-    const chapter =
-        studyState.chapter;
-
-    const subject =
-        studyState.subject;
 
     return [
 
         {
             type: "MCQ",
-
             question:
-                `Which of the following is an important concept in "${chapter}"?`,
-
+                `What is the main idea of ${studyState.chapter}?`,
             options: [
-                `Understanding the concepts of ${chapter}`,
-                "Ignoring the chapter",
-                "Skipping all examples",
-                "Memorising without understanding"
+                "Understanding the chapter concepts",
+                "Ignoring definitions",
+                "Only memorising answers",
+                "Skipping practice"
             ],
-
             answer: 0
         },
 
         {
             type: "MCQ",
-
             question:
-                `What should a student focus on while studying "${chapter}"?`,
-
+                "Which is the best way to learn a difficult concept?",
             options: [
-                "Concepts, definitions and examples",
-                "Only the chapter name",
-                "Skipping practice",
-                "Only memorising random answers"
+                "Understand it step by step",
+                "Skip it",
+                "Only memorise the title",
+                "Never practise"
             ],
-
             answer: 0
         },
 
         {
             type: "SHORT",
-
             question:
-                `Write one important concept that you learned from "${chapter}".`,
-
+                "Write one important concept from this chapter.",
             answer:
-                `The student should identify and explain an important concept related to ${chapter}.`
+                "Students should identify and explain a relevant concept from the chapter."
         },
 
         {
             type: "SHORT",
-
             question:
-                `Why is "${chapter}" important in ${subject}?`,
-
+                "Why is practice important?",
             answer:
-                `${chapter} is important because it develops understanding of important concepts in ${subject}.`
+                "Practice helps strengthen understanding and reveals areas that need revision."
         },
 
         {
             type: "LONG",
-
             question:
-                `Explain the main concepts of "${chapter}" in your own words.`,
-
+                "Summarise what you learned from this chapter.",
             answer:
-                `A good answer should explain the important concepts, definitions, examples and applications related to ${chapter}.`
+                "A good summary should mention the key definitions, concepts, examples and important relationships covered in the chapter."
         }
 
     ];
+
 }
+
 
 function startChapterTest() {
 
@@ -5082,14 +5177,19 @@ function evaluateTextAnswer(
 function finishChapterTest() {
 
     if (!activeChapterTest) {
+
         return;
+
     }
+
 
     const test =
         activeChapterTest;
 
+
     const total =
         test.questions.length;
+
 
     const percentage =
         Math.round(
@@ -5099,8 +5199,10 @@ function finishChapterTest() {
             ) * 100
         );
 
+
     const key =
         `${test.subject}|${test.chapter}`;
+
 
     data.chapterTests[key] = {
 
@@ -5116,13 +5218,11 @@ function finishChapterTest() {
 
     };
 
-    /*
-     * ========================================================
-     * CHAPTER PASS
-     * ========================================================
-     */
 
-    if (percentage >= 60) {
+    if (
+        percentage >=
+        60
+    ) {
 
         const allLessons =
             getChapterLessons(
@@ -5130,31 +5230,16 @@ function finishChapterTest() {
                 test.chapter
             );
 
-        const chapterIndex =
-    getCurriculumChapters(
-        test.subject
-    ).indexOf(
-        test.chapter
-    );
 
-        if (
-            !Array.isArray(
-                data.lessonProgress[
+        const chapterIndex =
+            Object.keys(
+                lessonData[
                     test.subject
                 ]
-            )
-        ) {
+            ).indexOf(
+                test.chapter
+            );
 
-            data.lessonProgress[
-                test.subject
-            ] = [];
-
-        }
-
-        /*
-         * Mark all lessons of this chapter
-         * as completed
-         */
 
         allLessons.forEach(
             (
@@ -5163,22 +5248,28 @@ function finishChapterTest() {
             ) => {
 
                 const id =
-                    `${studyState.board}-${studyState.className}-${studyState.stream}-${test.subject}-${chapterIndex}-${index}`;
+                    `${test.subject}-${chapterIndex}-${index}`;
+
 
                 if (
                     !data.lessonProgress[
                         test.subject
-                    ].includes(id)
+                    ].includes(
+                        id
+                    )
                 ) {
 
                     data.lessonProgress[
                         test.subject
-                    ].push(id);
+                    ].push(
+                        id
+                    );
 
                 }
 
             }
         );
+
 
         data.progress[
             normalizeProgressSubject(
@@ -5191,17 +5282,17 @@ function finishChapterTest() {
 
     }
 
+
     saveData();
+
 
     const area =
         document.getElementById(
             "currentLessonArea"
         );
 
-    if (area) {
 
-        const nextChapter =
-            getNextCurriculumChapter();
+    if (area) {
 
         area.innerHTML = `
 
@@ -5215,17 +5306,21 @@ function finishChapterTest() {
                     }
                 </div>
 
+
                 <h2>
                     Chapter Test Complete
                 </h2>
+
 
                 <div class="quiz-score-number">
                     ${test.score}/${total}
                 </div>
 
+
                 <h3>
                     ${percentage}%
                 </h3>
+
 
                 <p>
                     ${
@@ -5235,200 +5330,28 @@ function finishChapterTest() {
                     }
                 </p>
 
+
                 <br>
 
-                ${
-                    percentage >= 60 &&
-                    nextChapter
-                        ? `
-                            <button
-                                class="btn btn-primary"
-                                id="nextChapterAfterTest">
 
-                                📖 Next Chapter →
+                <button
+                    class="btn btn-primary"
+                    id="backToStudy">
 
-                            </button>
-                        `
-                        : `
-                            <button
-                                class="btn btn-secondary"
-                                id="backToStudy">
+                    ← Back to Study
 
-                                ← Back to Study
-
-                            </button>
-                        `
-                }
+                </button>
 
             </div>
 
         `;
 
-        const nextButton =
-            document.getElementById(
-                "nextChapterAfterTest"
-            );
 
-        if (nextButton) {
-
-            nextButton.addEventListener(
-                "click",
-                () => {
-
-                    studyState.chapter =
-                        nextChapter;
-
-                    studyState.lessonIndex =
-                        0;
-
-                    activeChapterTest =
-                        null;
-
-                    renderStudy();
-
-                    setTimeout(
-                        scrollToCurrentLesson,
-                        100
-                    );
-
-                }
-            );
-
-        }
-       function completeCurrentLesson() {
-
-    const subject =
-        studyState.subject;
-
-    const lessons =
-        getChapterLessons(
-            subject,
-            studyState.chapter
-        );
-
-    if (!lessons.length) {
-        return;
-    }
-
-    const chapterIndex =
-        getCurrentCurriculumChapterIndex();
-
-    const lessonId =
-        `${studyState.board}-${studyState.className}-${studyState.stream}-${subject}-${chapterIndex}-${studyState.lessonIndex}`;
-
-    if (
-        !Array.isArray(
-            data.lessonProgress[subject]
-        )
-    ) {
-        data.lessonProgress[subject] = [];
-    }
-
-    /* Mark current lesson complete */
-
-    if (
-        !data.lessonProgress[subject].includes(
-            lessonId
-        )
-    ) {
-
-        data.lessonProgress[subject].push(
-            lessonId
-        );
-
-        if (
-            typeof showToast === "function"
-        ) {
-            showToast(
-                "✅ Lesson completed!"
-            );
-        }
-    }
-
-    /* Update progress */
-
-    const progress =
-        calculateLessonProgress(
-            subject
-        );
-
-    const progressSubject =
-        normalizeProgressSubject(
-            subject
-        );
-
-    if (
-        progressSubject in data.progress
-    ) {
-        data.progress[
-            progressSubject
-        ] = progress;
-    }
-
-    saveData();
-
-    /* ========================================================
-       MORE LESSONS → NEXT LESSON
-       ======================================================== */
-
-    if (
-        studyState.lessonIndex <
-        lessons.length - 1
-    ) {
-
-        studyState.lessonIndex++;
-
-        renderStudy();
-
-        setTimeout(
-            scrollToCurrentLesson,
-            100
-        );
-
-        return;
-    }
-
-    /* ========================================================
-       LAST LESSON → CHAPTER TEST
-       ======================================================== */
-
-    showToast(
-        "🎯 Chapter ke lessons complete! Ab Chapter Test do."
-    );
-
-    setTimeout(
-        () => {
-            startChapterTest();
-        },
-        300
-    );
-
-    /* ========================================================
-       COURSE COMPLETE
-       ======================================================== */
-
-    renderStudy();
-
-    if (
-        typeof showToast === "function"
-    ) {
-
-        showToast(
-            "🏆 Course completed!"
-        );
-
-    }
-
-}
-
-        const backButton =
-            document.getElementById(
+        document
+            .getElementById(
                 "backToStudy"
-            );
-
-        if (backButton) {
-
-            backButton.addEventListener(
+            )
+            ?.addEventListener(
                 "click",
                 () => {
 
@@ -5440,14 +5363,14 @@ function finishChapterTest() {
                 }
             );
 
-        }
-
     }
+
 
     activeChapterTest =
         null;
 
 }
+
 
 /* ============================================================
    AI QUIZ
@@ -14664,4415 +14587,4 @@ Do not mention that this is a demo.
     }
 
 })();
-   
-/* =========================================================
-   BHARATBUDDY BOARD CURRICULUM SYSTEM
-   SAFE ADD-ON
-   Does NOT modify existing lessonData
-========================================================= */
-
-(function () {
-    "use strict";
-
-    const BOARD_STORAGE_KEY = "bharatbuddy_curriculum_v1";
-
-    let curriculumState = {
-        board: "",
-        className: "",
-        stream: "",
-        subject: "",
-        chapter: ""
-    };
-
-    /* =====================================================
-       CURRICULUM DATA
-       This is kept separate from existing lessonData
-    ===================================================== */
-
-    const boardCurriculum = {
-
-        CBSE: {
-
-            "Class 9": {
-                streams: {
-                    "General": {
-
-                        "Mathematics": [
-                            "Number Systems",
-                            "Polynomials",
-                            "Coordinate Geometry",
-                            "Linear Equations in Two Variables",
-                            "Introduction to Euclid's Geometry",
-                            "Lines and Angles",
-                            "Triangles",
-                            "Quadrilaterals",
-                            "Circles",
-                            "Heron's Formula",
-                            "Surface Areas and Volumes",
-                            "Statistics",
-                            "Probability"
-                        ],
-
-                        "Science": [
-                            "Matter in Our Surroundings",
-                            "Is Matter Around Us Pure",
-                            "Atoms and Molecules",
-                            "Structure of the Atom",
-                            "The Fundamental Unit of Life",
-                            "Tissues",
-                            "Motion",
-                            "Force and Laws of Motion",
-                            "Gravitation",
-                            "Work and Energy",
-                            "Sound",
-                            "Why Do We Fall Ill",
-                            "Natural Resources",
-                            "Improvement in Food Resources"
-                        ],
-
-                        "English": [
-                            "Grammar",
-                            "Reading Comprehension",
-                            "Writing Skills",
-                            "Literature"
-                        ],
-
-                        "Social Science": [
-                            "History",
-                            "Geography",
-                            "Political Science",
-                            "Economics"
-                        ]
-                    }
-                }
-            },
-
-            "Class 10": {
-                streams: {
-                    "General": {
-
-                        "Mathematics": [
-                            "Real Numbers",
-                            "Polynomials",
-                            "Pair of Linear Equations in Two Variables",
-                            "Quadratic Equations",
-                            "Arithmetic Progressions",
-                            "Triangles",
-                            "Coordinate Geometry",
-                            "Introduction to Trigonometry",
-                            "Some Applications of Trigonometry",
-                            "Circles",
-                            "Areas Related to Circles",
-                            "Surface Areas and Volumes",
-                            "Statistics",
-                            "Probability"
-                        ],
-
-                        "Science": [
-                            "Chemical Reactions and Equations",
-                            "Acids, Bases and Salts",
-                            "Metals and Non-metals",
-                            "Carbon and Its Compounds",
-                            "Life Processes",
-                            "Control and Coordination",
-                            "How Do Organisms Reproduce",
-                            "Heredity",
-                            "Light",
-                            "Human Eye and Colourful World",
-                            "Electricity",
-                            "Magnetic Effects of Electric Current",
-                            "Our Environment"
-                        ],
-
-                        "English": [
-                            "Grammar",
-                            "Reading Comprehension",
-                            "Writing Skills",
-                            "Literature"
-                        ],
-
-                        "Social Science": [
-                            "History",
-                            "Geography",
-                            "Political Science",
-                            "Economics"
-                        ]
-                    }
-                }
-            },
-
-            "Class 11": {
-                streams: {
-
-                    "PCM": {
-                        "Physics": [
-                            "Units and Measurements",
-                            "Motion in a Straight Line",
-                            "Motion in a Plane",
-                            "Laws of Motion",
-                            "Work, Energy and Power",
-                            "System of Particles and Rotational Motion",
-                            "Gravitation",
-                            "Mechanical Properties of Solids",
-                            "Mechanical Properties of Fluids",
-                            "Thermal Properties of Matter",
-                            "Thermodynamics",
-                            "Kinetic Theory",
-                            "Oscillations",
-                            "Waves"
-                        ],
-
-                        "Chemistry": [
-                            "Some Basic Concepts of Chemistry",
-                            "Structure of Atom",
-                            "Classification of Elements and Periodicity",
-                            "Chemical Bonding and Molecular Structure",
-                            "Thermodynamics",
-                            "Equilibrium",
-                            "Redox Reactions",
-                            "Organic Chemistry",
-                            "Hydrocarbons"
-                        ],
-
-                        "Mathematics": [
-                            "Sets",
-                            "Relations and Functions",
-                            "Trigonometric Functions",
-                            "Complex Numbers",
-                            "Linear Inequalities",
-                            "Permutations and Combinations",
-                            "Binomial Theorem",
-                            "Sequences and Series",
-                            "Straight Lines",
-                            "Conic Sections",
-                            "Introduction to Three Dimensional Geometry",
-                            "Limits and Derivatives",
-                            "Statistics",
-                            "Probability"
-                        ],
-
-                        "Computer Science": [
-                            "Computer Systems",
-                            "Python Programming",
-                            "Data Representation",
-                            "Boolean Logic",
-                            "Data Handling",
-                            "Computer Networks",
-                            "Cyber Safety"
-                        ],
-
-                        "English": [
-                            "Reading Skills",
-                            "Grammar",
-                            "Writing Skills",
-                            "Literature"
-                        ]
-                    },
-
-                    "PCB": {
-                        "Physics": [
-                            "Units and Measurements",
-                            "Motion in a Straight Line",
-                            "Motion in a Plane",
-                            "Laws of Motion",
-                            "Work, Energy and Power",
-                            "System of Particles and Rotational Motion",
-                            "Gravitation",
-                            "Mechanical Properties of Solids",
-                            "Mechanical Properties of Fluids",
-                            "Thermal Properties of Matter",
-                            "Thermodynamics",
-                            "Kinetic Theory",
-                            "Oscillations",
-                            "Waves"
-                        ],
-
-                        "Chemistry": [
-                            "Some Basic Concepts of Chemistry",
-                            "Structure of Atom",
-                            "Classification of Elements and Periodicity",
-                            "Chemical Bonding and Molecular Structure",
-                            "Thermodynamics",
-                            "Equilibrium",
-                            "Redox Reactions",
-                            "Organic Chemistry",
-                            "Hydrocarbons"
-                        ],
-
-                        "Biology": [
-                            "The Living World",
-                            "Biological Classification",
-                            "Plant Kingdom",
-                            "Animal Kingdom",
-                            "Morphology of Flowering Plants",
-                            "Anatomy of Flowering Plants",
-                            "Structural Organisation in Animals",
-                            "Cell: The Unit of Life",
-                            "Biomolecules",
-                            "Cell Cycle and Cell Division",
-                            "Transport in Plants",
-                            "Mineral Nutrition",
-                            "Photosynthesis",
-                            "Respiration in Plants",
-                            "Plant Growth and Development",
-                            "Digestion and Absorption",
-                            "Breathing and Exchange of Gases",
-                            "Body Fluids and Circulation",
-                            "Excretory Products and Their Elimination",
-                            "Locomotion and Movement",
-                            "Neural Control and Coordination",
-                            "Chemical Coordination and Integration"
-                        ],
-
-                        "English": [
-                            "Reading Skills",
-                            "Grammar",
-                            "Writing Skills",
-                            "Literature"
-                        ]
-                    },
-
-                    "Commerce": {
-                        "Accountancy": [
-                            "Introduction to Accounting",
-                            "Theory Base of Accounting",
-                            "Recording of Transactions",
-                            "Bank Reconciliation Statement",
-                            "Trial Balance",
-                            "Depreciation",
-                            "Bills of Exchange",
-                            "Financial Statements",
-                            "Computerised Accounting"
-                        ],
-
-                        "Business Studies": [
-                            "Nature and Purpose of Business",
-                            "Forms of Business Organisation",
-                            "Private, Public and Global Enterprises",
-                            "Business Services",
-                            "Emerging Modes of Business",
-                            "Social Responsibility of Business",
-                            "Formation of a Company",
-                            "Sources of Business Finance",
-                            "Small Business",
-                            "Internal Trade",
-                            "International Business"
-                        ],
-
-                        "Economics": [
-                            "Introduction to Economics",
-                            "Theory of Consumer Behaviour",
-                            "Production and Costs",
-                            "The Theory of Firm",
-                            "Market Equilibrium",
-                            "Statistics for Economics",
-                            "Collection of Data",
-                            "Organisation of Data",
-                            "Presentation of Data",
-                            "Statistical Tools",
-                            "Measures of Central Tendency"
-                        ],
-
-                        "Mathematics": [
-                            "Sets",
-                            "Relations and Functions",
-                            "Trigonometric Functions",
-                            "Complex Numbers",
-                            "Linear Inequalities",
-                            "Permutations and Combinations",
-                            "Binomial Theorem",
-                            "Sequences and Series",
-                            "Straight Lines",
-                            "Statistics",
-                            "Probability"
-                        ],
-
-                        "English": [
-                            "Reading Skills",
-                            "Grammar",
-                            "Writing Skills",
-                            "Literature"
-                        ]
-                    },
-
-                    "Arts": {
-                        "History": [
-                            "Early Societies",
-                            "Writing and City Life",
-                            "An Empire Across Three Continents",
-                            "Nomadic Empires",
-                            "The Three Orders",
-                            "Changing Cultural Traditions",
-                            "Displacing Indigenous Peoples",
-                            "Paths to Modernisation"
-                        ],
-
-                        "Geography": [
-                            "Geography as a Discipline",
-                            "The Earth",
-                            "Landforms",
-                            "Climate",
-                            "Water",
-                            "Natural Vegetation",
-                            "Natural Hazards",
-                            "India: Location",
-                            "Structure and Physiography",
-                            "Drainage",
-                            "Climate",
-                            "Natural Vegetation",
-                            "Natural Hazards"
-                        ],
-
-                        "Political Science": [
-                            "Constitution",
-                            "Rights in the Indian Constitution",
-                            "Election and Representation",
-                            "Executive",
-                            "Legislature",
-                            "Judiciary",
-                            "Federalism",
-                            "Local Governments",
-                            "Constitution as a Living Document",
-                            "Political Philosophy"
-                        ],
-
-                        "Sociology": [
-                            "Sociology and Society",
-                            "Terms, Concepts and their Use",
-                            "Understanding Social Institutions",
-                            "Culture and Socialisation",
-                            "Social Change and Social Order",
-                            "Environment and Society",
-                            "Introducing Western Sociologists",
-                            "Indian Sociologists"
-                        ],
-
-                        "English": [
-                            "Reading Skills",
-                            "Grammar",
-                            "Writing Skills",
-                            "Literature"
-                        ]
-                    }
-                }
-            },
-
-            "Class 12": {
-                streams: {
-
-                    "Science": {
-                        "Physics": [
-                            "Electric Charges and Fields",
-                            "Electrostatic Potential and Capacitance",
-                            "Current Electricity",
-                            "Moving Charges and Magnetism",
-                            "Magnetism and Matter",
-                            "Electromagnetic Induction",
-                            "Alternating Current",
-                            "Electromagnetic Waves",
-                            "Ray Optics",
-                            "Wave Optics",
-                            "Dual Nature of Radiation and Matter",
-                            "Atoms",
-                            "Nuclei",
-                            "Semiconductor Electronics"
-                        ],
-
-                        "Chemistry": [
-                            "Solutions",
-                            "Electrochemistry",
-                            "Chemical Kinetics",
-                            "d and f Block Elements",
-                            "Coordination Compounds",
-                            "Haloalkanes and Haloarenes",
-                            "Alcohols, Phenols and Ethers",
-                            "Aldehydes, Ketones and Carboxylic Acids",
-                            "Amines",
-                            "Biomolecules"
-                        ],
-
-                        "Mathematics": [
-                            "Relations and Functions",
-                            "Inverse Trigonometric Functions",
-                            "Matrices",
-                            "Determinants",
-                            "Continuity and Differentiability",
-                            "Application of Derivatives",
-                            "Integrals",
-                            "Application of Integrals",
-                            "Differential Equations",
-                            "Vector Algebra",
-                            "Three Dimensional Geometry",
-                            "Linear Programming",
-                            "Probability"
-                        ],
-
-                        "Biology": [
-                            "Sexual Reproduction in Flowering Plants",
-                            "Human Reproduction",
-                            "Reproductive Health",
-                            "Principles of Inheritance",
-                            "Molecular Basis of Inheritance",
-                            "Evolution",
-                            "Human Health and Disease",
-                            "Microbes in Human Welfare",
-                            "Biotechnology",
-                            "Organisms and Populations",
-                            "Ecosystem",
-                            "Biodiversity and Conservation"
-                        ],
-
-                        "Computer Science": [
-                            "Python Revision Tour",
-                            "Functions",
-                            "File Handling",
-                            "Data Structures",
-                            "Computer Networks",
-                            "Database Concepts",
-                            "SQL"
-                        ],
-
-                        "English": [
-                            "Reading Skills",
-                            "Grammar",
-                            "Writing Skills",
-                            "Literature"
-                        ]
-                    },
-
-                    "Commerce": {
-                        "Accountancy": [
-                            "Accounting for Partnership Firms",
-                            "Change in Profit Sharing Ratio",
-                            "Admission of a Partner",
-                            "Retirement of a Partner",
-                            "Dissolution of Partnership",
-                            "Accounting for Companies",
-                            "Analysis of Financial Statements",
-                            "Cash Flow Statement"
-                        ],
-
-                        "Business Studies": [
-                            "Nature and Significance of Management",
-                            "Principles of Management",
-                            "Business Environment",
-                            "Planning",
-                            "Organising",
-                            "Staffing",
-                            "Directing",
-                            "Controlling",
-                            "Financial Management",
-                            "Marketing Management",
-                            "Consumer Protection"
-                        ],
-
-                        "Economics": [
-                            "National Income",
-                            "Money and Banking",
-                            "Determination of Income and Employment",
-                            "Government Budget",
-                            "Balance of Payments",
-                            "Indian Economy",
-                            "Economic Reforms",
-                            "Human Capital Formation",
-                            "Rural Development",
-                            "Employment",
-                            "Sustainable Development"
-                        ],
-
-                        "Mathematics": [
-                            "Relations and Functions",
-                            "Matrices",
-                            "Determinants",
-                            "Calculus",
-                            "Vector Algebra",
-                            "Three Dimensional Geometry",
-                            "Linear Programming",
-                            "Probability"
-                        ],
-
-                        "English": [
-                            "Reading Skills",
-                            "Grammar",
-                            "Writing Skills",
-                            "Literature"
-                        ]
-                    },
-
-                    "Arts": {
-                        "History": [
-                            "Bricks, Beads and Bones",
-                            "Kings, Farmers and Towns",
-                            "Kinship, Caste and Class",
-                            "Thinkers, Beliefs and Buildings",
-                            "Through the Eyes of Travellers",
-                            "Bhakti-Sufi Traditions",
-                            "An Imperial Capital",
-                            "Peasants, Zamindars and the State",
-                            "Colonialism and the Countryside",
-                            "Rebels and the Raj",
-                            "Mahatma Gandhi and the Nationalist Movement",
-                            "Framing the Constitution"
-                        ],
-
-                        "Geography": [
-                            "Human Geography",
-                            "Population",
-                            "Human Development",
-                            "Primary Activities",
-                            "Secondary Activities",
-                            "Tertiary Activities",
-                            "Transport and Communication",
-                            "International Trade",
-                            "Population Distribution",
-                            "Migration",
-                            "Human Settlements",
-                            "Resources",
-                            "Water Resources",
-                            "Mineral Resources",
-                            "Manufacturing Industries",
-                            "Planning and Sustainable Development"
-                        ],
-
-                        "Political Science": [
-                            "The End of Bipolarity",
-                            "Contemporary Centres of Power",
-                            "Challenges of Nation-Building",
-                            "Era of One-Party Dominance",
-                            "Politics of Planned Development",
-                            "Crisis of Democratic Order",
-                            "Regional Aspirations",
-                            "Recent Developments in Indian Politics"
-                        ],
-
-                        "Sociology": [
-                            "Introducing Indian Society",
-                            "Demographic Structure",
-                            "Social Institutions",
-                            "Market as a Social Institution",
-                            "Patterns of Social Inequality",
-                            "Cultural Diversity",
-                            "Structural Change",
-                            "Cultural Change",
-                            "Change and Development in Rural Society",
-                            "Change and Development in Industrial Society"
-                        ],
-
-                        "English": [
-                            "Reading Skills",
-                            "Grammar",
-                            "Writing Skills",
-                            "Literature"
-                        ]
-                    }
-                }
-            }
-        },
-
-        /* =================================================
-           BSEB
-           Separate data so CBSE and BSEB never mix
-        ================================================= */
-
-        BSEB: {
-
-            "Class 9": {
-                streams: {
-                    "General": {
-                        "Mathematics": [
-                            "Number System",
-                            "Polynomials",
-                            "Coordinate Geometry",
-                            "Linear Equations",
-                            "Lines and Angles",
-                            "Triangles",
-                            "Quadrilaterals",
-                            "Circles",
-                            "Heron's Formula",
-                            "Surface Areas and Volumes",
-                            "Statistics",
-                            "Probability"
-                        ],
-
-                        "Science": [
-                            "Matter",
-                            "Atoms and Molecules",
-                            "Structure of Atom",
-                            "Motion",
-                            "Force",
-                            "Gravitation",
-                            "Work and Energy",
-                            "Sound",
-                            "Cell",
-                            "Tissues",
-                            "Health",
-                            "Natural Resources"
-                        ],
-
-                        "English": [
-                            "Reading",
-                            "Grammar",
-                            "Writing",
-                            "Literature"
-                        ],
-
-                        "Social Science": [
-                            "History",
-                            "Geography",
-                            "Civics",
-                            "Economics"
-                        ],
-
-                        "Hindi": [
-                            "गद्य",
-                            "पद्य",
-                            "व्याकरण",
-                            "लेखन"
-                        ]
-                    }
-                }
-            },
-
-            "Class 10": {
-                streams: {
-                    "General": {
-                        "Mathematics": [
-                            "Real Numbers",
-                            "Polynomials",
-                            "Linear Equations",
-                            "Quadratic Equations",
-                            "Arithmetic Progressions",
-                            "Triangles",
-                            "Coordinate Geometry",
-                            "Trigonometry",
-                            "Circles",
-                            "Areas",
-                            "Surface Areas and Volumes",
-                            "Statistics",
-                            "Probability"
-                        ],
-
-                        "Science": [
-                            "Chemical Reactions",
-                            "Acids Bases and Salts",
-                            "Metals and Non-metals",
-                            "Carbon Compounds",
-                            "Life Processes",
-                            "Control and Coordination",
-                            "Reproduction",
-                            "Heredity",
-                            "Light",
-                            "Electricity",
-                            "Magnetic Effects",
-                            "Environment"
-                        ],
-
-                        "English": [
-                            "Reading",
-                            "Grammar",
-                            "Writing",
-                            "Literature"
-                        ],
-
-                        "Social Science": [
-                            "History",
-                            "Geography",
-                            "Civics",
-                            "Economics"
-                        ],
-
-                        "Hindi": [
-                            "गद्य",
-                            "पद्य",
-                            "व्याकरण",
-                            "लेखन"
-                        ]
-                    }
-                }
-            },
-
-            "Class 11": {
-                streams: {
-
-                    "Science": {
-                        "Physics": [
-                            "Units and Measurements",
-                            "Motion",
-                            "Laws of Motion",
-                            "Work Energy and Power",
-                            "Rotational Motion",
-                            "Gravitation",
-                            "Properties of Matter",
-                            "Thermodynamics",
-                            "Kinetic Theory",
-                            "Oscillations",
-                            "Waves"
-                        ],
-
-                        "Chemistry": [
-                            "Basic Concepts",
-                            "Structure of Atom",
-                            "Periodic Classification",
-                            "Chemical Bonding",
-                            "Thermodynamics",
-                            "Equilibrium",
-                            "Redox Reactions",
-                            "Organic Chemistry",
-                            "Hydrocarbons"
-                        ],
-
-                        "Mathematics": [
-                            "Sets",
-                            "Relations and Functions",
-                            "Trigonometry",
-                            "Complex Numbers",
-                            "Permutations and Combinations",
-                            "Binomial Theorem",
-                            "Sequences and Series",
-                            "Coordinate Geometry",
-                            "Limits",
-                            "Statistics",
-                            "Probability"
-                        ],
-
-                        "Biology": [
-                            "Living World",
-                            "Biological Classification",
-                            "Plant Kingdom",
-                            "Animal Kingdom",
-                            "Cell",
-                            "Biomolecules",
-                            "Plant Physiology",
-                            "Human Physiology"
-                        ],
-
-                        "English": [
-                            "Reading",
-                            "Grammar",
-                            "Writing",
-                            "Literature"
-                        ]
-                    },
-
-                    "Commerce": {
-                        "Accountancy": [
-                            "Introduction to Accounting",
-                            "Theory Base",
-                            "Recording Transactions",
-                            "Trial Balance",
-                            "Depreciation",
-                            "Financial Statements"
-                        ],
-
-                        "Business Studies": [
-                            "Nature of Business",
-                            "Forms of Organisation",
-                            "Business Services",
-                            "Emerging Business",
-                            "Social Responsibility",
-                            "Business Finance",
-                            "Internal Trade"
-                        ],
-
-                        "Economics": [
-                            "Introduction",
-                            "Consumer Behaviour",
-                            "Production",
-                            "Market",
-                            "Statistics",
-                            "Data Collection",
-                            "Data Presentation",
-                            "Statistical Tools"
-                        ],
-
-                        "Mathematics": [
-                            "Sets",
-                            "Relations and Functions",
-                            "Trigonometry",
-                            "Complex Numbers",
-                            "Permutations",
-                            "Binomial Theorem",
-                            "Sequences",
-                            "Statistics",
-                            "Probability"
-                        ],
-
-                        "English": [
-                            "Reading",
-                            "Grammar",
-                            "Writing",
-                            "Literature"
-                        ]
-                    },
-
-                    "Arts": {
-                        "History": [
-                            "Ancient Societies",
-                            "Early Civilisations",
-                            "Empires",
-                            "Medieval Society",
-                            "Cultural Traditions",
-                            "Modernisation"
-                        ],
-
-                        "Geography": [
-                            "Geography as a Discipline",
-                            "Earth",
-                            "Landforms",
-                            "Climate",
-                            "Water",
-                            "Natural Vegetation",
-                            "India"
-                        ],
-
-                        "Political Science": [
-                            "Constitution",
-                            "Rights",
-                            "Election",
-                            "Executive",
-                            "Legislature",
-                            "Judiciary",
-                            "Federalism"
-                        ],
-
-                        "Sociology": [
-                            "Society",
-                            "Social Institutions",
-                            "Culture",
-                            "Socialisation",
-                            "Social Change"
-                        ],
-
-                        "English": [
-                            "Reading",
-                            "Grammar",
-                            "Writing",
-                            "Literature"
-                        ]
-                    }
-                }
-            },
-
-            "Class 12": {
-                streams: {
-
-                    "Science": {
-                        "Physics": [
-                            "Electric Charges and Fields",
-                            "Electrostatic Potential",
-                            "Current Electricity",
-                            "Moving Charges and Magnetism",
-                            "Magnetism",
-                            "Electromagnetic Induction",
-                            "Alternating Current",
-                            "Electromagnetic Waves",
-                            "Ray Optics",
-                            "Wave Optics",
-                            "Dual Nature",
-                            "Atoms",
-                            "Nuclei",
-                            "Semiconductor Electronics"
-                        ],
-
-                        "Chemistry": [
-                            "Solutions",
-                            "Electrochemistry",
-                            "Chemical Kinetics",
-                            "d and f Block",
-                            "Coordination Compounds",
-                            "Haloalkanes",
-                            "Alcohols Phenols and Ethers",
-                            "Aldehydes Ketones",
-                            "Amines",
-                            "Biomolecules"
-                        ],
-
-                        "Mathematics": [
-                            "Relations and Functions",
-                            "Matrices",
-                            "Determinants",
-                            "Continuity",
-                            "Derivatives",
-                            "Integrals",
-                            "Differential Equations",
-                            "Vectors",
-                            "Three Dimensional Geometry",
-                            "Probability"
-                        ],
-
-                        "Biology": [
-                            "Reproduction",
-                            "Genetics",
-                            "Evolution",
-                            "Human Health",
-                            "Biotechnology",
-                            "Ecology",
-                            "Biodiversity"
-                        ],
-
-                        "English": [
-                            "Reading",
-                            "Grammar",
-                            "Writing",
-                            "Literature"
-                        ]
-                    },
-
-                    "Commerce": {
-                        "Accountancy": [
-                            "Partnership Accounts",
-                            "Admission",
-                            "Retirement",
-                            "Dissolution",
-                            "Company Accounts",
-                            "Financial Statements",
-                            "Cash Flow"
-                        ],
-
-                        "Business Studies": [
-                            "Management",
-                            "Planning",
-                            "Organising",
-                            "Staffing",
-                            "Directing",
-                            "Controlling",
-                            "Financial Management",
-                            "Marketing",
-                            "Consumer Protection"
-                        ],
-
-                        "Economics": [
-                            "National Income",
-                            "Money and Banking",
-                            "Income and Employment",
-                            "Government Budget",
-                            "Balance of Payments",
-                            "Indian Economy",
-                            "Economic Reforms",
-                            "Employment",
-                            "Sustainable Development"
-                        ],
-
-                        "Mathematics": [
-                            "Relations and Functions",
-                            "Matrices",
-                            "Determinants",
-                            "Calculus",
-                            "Vectors",
-                            "Three Dimensional Geometry",
-                            "Probability"
-                        ],
-
-                        "English": [
-                            "Reading",
-                            "Grammar",
-                            "Writing",
-                            "Literature"
-                        ]
-                    },
-
-                    "Arts": {
-                        "History": [
-                            "Ancient India",
-                            "Medieval India",
-                            "Colonial India",
-                            "National Movement",
-                            "Constitution"
-                        ],
-
-                        "Geography": [
-                            "Human Geography",
-                            "Population",
-                            "Human Development",
-                            "Resources",
-                            "Agriculture",
-                            "Industries",
-                            "Transport",
-                            "India"
-                        ],
-
-                        "Political Science": [
-                            "Political Theory",
-                            "Indian Constitution",
-                            "Democracy",
-                            "Federalism",
-                            "International Politics",
-                            "Indian Politics"
-                        ],
-
-                        "Sociology": [
-                            "Indian Society",
-                            "Demography",
-                            "Social Institutions",
-                            "Inequality",
-                            "Cultural Diversity",
-                            "Social Change"
-                        ],
-
-                        "English": [
-                            "Reading",
-                            "Grammar",
-                            "Writing",
-                            "Literature"
-                        ]
-                    }
-                }
-            }
-        }
-    };
-
-
-    /* =====================================================
-       STORAGE
-    ===================================================== */
-
-    function loadCurriculumState() {
-        try {
-            const saved = localStorage.getItem(BOARD_STORAGE_KEY);
-
-            if (saved) {
-                curriculumState = {
-                    ...curriculumState,
-                    ...JSON.parse(saved)
-                };
-            }
-        } catch (error) {
-            console.warn("Curriculum storage error:", error);
-        }
-    }
-
-    function saveCurriculumState() {
-        try {
-            localStorage.setItem(
-                BOARD_STORAGE_KEY,
-                JSON.stringify(curriculumState)
-            );
-        } catch (error) {
-            console.warn("Curriculum save error:", error);
-        }
-    }
-
-
-    /* =====================================================
-       HELPERS
-    ===================================================== */
-
-    function getClasses(board) {
-        if (!boardCurriculum[board]) return [];
-        return Object.keys(boardCurriculum[board]);
-    }
-
-    function getStreams(board, className) {
-        if (
-            !boardCurriculum[board] ||
-            !boardCurriculum[board][className]
-        ) {
-            return [];
-        }
-
-        return Object.keys(
-            boardCurriculum[board][className].streams
-        );
-    }
-
-    function getSubjects(board, className, stream) {
-        try {
-            return Object.keys(
-                boardCurriculum[board][className]
-                    .streams[stream]
-            );
-        } catch {
-            return [];
-        }
-    }
-
-    function getChapters(board, className, stream, subject) {
-        try {
-            return boardCurriculum[board][className]
-                .streams[stream][subject] || [];
-        } catch {
-            return [];
-        }
-    }
-
-
-    /* =====================================================
-       UI
-    ===================================================== */
-
-    function createBoardSystem() {
-
-        const pageContent = document.getElementById("pageContent");
-
-        if (!pageContent) return;
-
-        if (document.getElementById("bharatBuddyBoardSystem")) {
-            return;
-        }
-
-        const wrapper = document.createElement("div");
-
-        wrapper.id = "bharatBuddyBoardSystem";
-
-        wrapper.innerHTML = `
-            <div style="
-                margin-bottom:25px;
-                padding:22px;
-                border-radius:18px;
-                background:linear-gradient(135deg,#eef4ff,#ffffff);
-                border:1px solid #dce5f5;
-                box-shadow:0 8px 30px rgba(0,0,0,.06);
-            ">
-
-                <div style="margin-bottom:18px;">
-                    <h2 style="margin:0 0 6px;">
-                        📚 Board Study
-                    </h2>
-
-                    <p style="margin:0;opacity:.7;">
-                        Apna Board, Class, Stream, Subject aur Chapter select karo.
-                    </p>
-                </div>
-
-
-                <div style="
-                    display:grid;
-                    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-                    gap:14px;
-                ">
-
-                    <div>
-                        <label>Board</label>
-                        <select id="bbBoardSelect"
-                            style="width:100%;padding:12px;border-radius:10px;">
-                            <option value="">Select Board</option>
-                            <option value="CBSE">CBSE</option>
-                            <option value="BSEB">BSEB</option>
-                        </select>
-                    </div>
-
-
-                    <div>
-                        <label>Class</label>
-                        <select id="bbClassSelect"
-                            style="width:100%;padding:12px;border-radius:10px;"
-                            disabled>
-                            <option value="">Select Class</option>
-                        </select>
-                    </div>
-
-
-                    <div id="bbStreamBox">
-                        <label>Stream</label>
-                        <select id="bbStreamSelect"
-                            style="width:100%;padding:12px;border-radius:10px;"
-                            disabled>
-                            <option value="">Select Stream</option>
-                        </select>
-                    </div>
-
-
-                    <div>
-                        <label>Subject</label>
-                        <select id="bbSubjectSelect"
-                            style="width:100%;padding:12px;border-radius:10px;"
-                            disabled>
-                            <option value="">Select Subject</option>
-                        </select>
-                    </div>
-
-
-                    <div>
-                        <label>Chapter</label>
-                        <select id="bbChapterSelect"
-                            style="width:100%;padding:12px;border-radius:10px;"
-                            disabled>
-                            <option value="">Select Chapter</option>
-                        </select>
-                    </div>
-
-                </div>
-
-
-                <div style="
-                    display:flex;
-                    flex-wrap:wrap;
-                    gap:10px;
-                    margin-top:18px;
-                ">
-
-                    <button id="bbStudyBtn"
-                        style="
-                            padding:12px 18px;
-                            border:0;
-                            border-radius:10px;
-                            cursor:pointer;
-                            font-weight:600;
-                        ">
-                        🤖 AI Study Notes
-                    </button>
-
-                    <button id="bbTestBtn"
-                        style="
-                            padding:12px 18px;
-                            border:0;
-                            border-radius:10px;
-                            cursor:pointer;
-                            font-weight:600;
-                        ">
-                        📝 Chapter Test
-                    </button>
-
-                </div>
-
-
-                <div id="bbSelectionInfo"
-                    style="
-                        margin-top:18px;
-                        padding:14px;
-                        border-radius:12px;
-                        background:rgba(255,255,255,.8);
-                        display:none;
-                    ">
-                </div>
-
-            </div>
-        `;
-
-        pageContent.prepend(wrapper);
-
-        loadCurriculumState();
-
-        setupBoardEvents();
-
-        restoreBoardSelection();
-    }
-
-
-    /* =====================================================
-       EVENTS
-    ===================================================== */
-
-    function setupBoardEvents() {
-
-        const board = document.getElementById("bbBoardSelect");
-        const classSelect = document.getElementById("bbClassSelect");
-        const stream = document.getElementById("bbStreamSelect");
-        const subject = document.getElementById("bbSubjectSelect");
-        const chapter = document.getElementById("bbChapterSelect");
-
-        if (!board) return;
-
-
-        board.addEventListener("change", function () {
-
-            curriculumState.board = this.value;
-            curriculumState.className = "";
-            curriculumState.stream = "";
-            curriculumState.subject = "";
-            curriculumState.chapter = "";
-
-            saveCurriculumState();
-
-            fillClasses();
-            clearSelect(stream, "Select Stream");
-            clearSelect(subject, "Select Subject");
-            clearSelect(chapter, "Select Chapter");
-        });
-
-
-        classSelect.addEventListener("change", function () {
-
-            curriculumState.className = this.value;
-            curriculumState.stream = "";
-            curriculumState.subject = "";
-            curriculumState.chapter = "";
-
-            saveCurriculumState();
-
-            fillStreams();
-            clearSelect(subject, "Select Subject");
-            clearSelect(chapter, "Select Chapter");
-        });
-
-
-        stream.addEventListener("change", function () {
-
-            curriculumState.stream = this.value;
-            curriculumState.subject = "";
-            curriculumState.chapter = "";
-
-            saveCurriculumState();
-
-            fillSubjects();
-            clearSelect(chapter, "Select Chapter");
-        });
-
-
-        subject.addEventListener("change", function () {
-
-            curriculumState.subject = this.value;
-            curriculumState.chapter = "";
-
-            saveCurriculumState();
-
-            fillChapters();
-        });
-
-
-        chapter.addEventListener("change", function () {
-
-            curriculumState.chapter = this.value;
-
-            saveCurriculumState();
-
-            showSelection();
-        });
-
-
-        document.getElementById("bbStudyBtn")
-            .addEventListener("click", generateStudyNotes);
-
-
-        document.getElementById("bbTestBtn")
-            .addEventListener("click", generateChapterTest);
-    }
-
-
-    /* =====================================================
-       SELECT HELPERS
-    ===================================================== */
-
-    function clearSelect(select, text) {
-
-        if (!select) return;
-
-        select.innerHTML =
-            `<option value="">${text}</option>`;
-
-        select.disabled = true;
-    }
-
-
-    function fillClasses() {
-
-        const select =
-            document.getElementById("bbClassSelect");
-
-        const classes =
-            getClasses(curriculumState.board);
-
-        select.innerHTML =
-            `<option value="">Select Class</option>`;
-
-        classes.forEach(className => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = className;
-            option.textContent = className;
-
-            select.appendChild(option);
-        });
-
-        select.disabled = classes.length === 0;
-    }
-
-
-    function fillStreams() {
-
-        const select =
-            document.getElementById("bbStreamSelect");
-
-        const streams =
-            getStreams(
-                curriculumState.board,
-                curriculumState.className
-            );
-
-        select.innerHTML =
-            `<option value="">Select Stream</option>`;
-
-        streams.forEach(streamName => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = streamName;
-            option.textContent = streamName;
-
-            select.appendChild(option);
-        });
-
-        select.disabled = streams.length === 0;
-
-        const streamBox =
-            document.getElementById("bbStreamBox");
-
-        /*
-          Class 9/10 has General.
-          We still keep it simple for the user.
-        */
-
-        if (
-            streams.length === 1 &&
-            streams[0] === "General"
-        ) {
-            select.value = "General";
-            curriculumState.stream = "General";
-
-            saveCurriculumState();
-
-            fillSubjects();
-        }
-    }
-
-
-    function fillSubjects() {
-
-        const select =
-            document.getElementById("bbSubjectSelect");
-
-        const subjects =
-            getSubjects(
-                curriculumState.board,
-                curriculumState.className,
-                curriculumState.stream
-            );
-
-        select.innerHTML =
-            `<option value="">Select Subject</option>`;
-
-        subjects.forEach(subjectName => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = subjectName;
-            option.textContent = subjectName;
-
-            select.appendChild(option);
-        });
-
-        select.disabled = subjects.length === 0;
-    }
-
-
-    function fillChapters() {
-
-        const select =
-            document.getElementById("bbChapterSelect");
-
-        const chapters =
-            getChapters(
-                curriculumState.board,
-                curriculumState.className,
-                curriculumState.stream,
-                curriculumState.subject
-            );
-
-        select.innerHTML =
-            `<option value="">Select Chapter</option>`;
-
-        chapters.forEach((chapterName, index) => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = chapterName;
-
-            option.textContent =
-                `${index + 1}. ${chapterName}`;
-
-            select.appendChild(option);
-        });
-
-        select.disabled = chapters.length === 0;
-    }
-
-
-    /* =====================================================
-       RESTORE
-    ===================================================== */
-
-    function restoreBoardSelection() {
-
-        if (!curriculumState.board) return;
-
-        const board =
-            document.getElementById("bbBoardSelect");
-
-        board.value =
-            curriculumState.board;
-
-        fillClasses();
-
-        const classSelect =
-            document.getElementById("bbClassSelect");
-
-        classSelect.value =
-            curriculumState.className;
-
-        if (curriculumState.className) {
-
-            fillStreams();
-
-            const stream =
-                document.getElementById("bbStreamSelect");
-
-            stream.value =
-                curriculumState.stream;
-
-            if (curriculumState.stream) {
-
-                fillSubjects();
-
-                const subject =
-                    document.getElementById("bbSubjectSelect");
-
-                subject.value =
-                    curriculumState.subject;
-
-                if (curriculumState.subject) {
-
-                    fillChapters();
-
-                    const chapter =
-                        document.getElementById("bbChapterSelect");
-
-                    chapter.value =
-                        curriculumState.chapter;
-
-                    showSelection();
-                }
-            }
-        }
-    }
-
-
-    /* =====================================================
-       SELECTION INFO
-    ===================================================== */
-
-    function showSelection() {
-
-        const info =
-            document.getElementById("bbSelectionInfo");
-
-        if (
-            !curriculumState.board ||
-            !curriculumState.className ||
-            !curriculumState.subject ||
-            !curriculumState.chapter
-        ) {
-            info.style.display = "none";
-            return;
-        }
-
-        info.style.display = "block";
-
-        info.innerHTML = `
-            <strong>Current Selection</strong><br>
-            🏫 ${curriculumState.board}
-            &nbsp; | &nbsp;
-            🎓 ${curriculumState.className}
-            &nbsp; | &nbsp;
-            📖 ${curriculumState.subject}
-            &nbsp; | &nbsp;
-            📚 ${curriculumState.chapter}
-        `;
-    }
-
-
-    /* =====================================================
-       AI STUDY NOTES
-    ===================================================== */
-
-    async function generateStudyNotes() {
-
-    if (
-        !curriculumState.board ||
-        !curriculumState.className ||
-        !curriculumState.subject ||
-        !curriculumState.chapter
-    ) {
-        alert(
-            "Pehle Board, Class, Stream, Subject aur Chapter select karo."
-        );
-        return;
-    }
-
-    const btn = document.getElementById("bbStudyBtn");
-
-    if (!btn) return;
-
-    const originalText = btn.innerHTML;
-
-    btn.disabled = true;
-    btn.innerHTML = "⏳ BharatBuddy notes bana raha hai...";
-
-    try {
-
-        const prompt = `
-You are BharatBuddy AI, a premium student learning assistant.
-
-Create ORIGINAL, accurate and student-friendly study notes for EXACTLY this selection:
-
-Board: ${curriculumState.board}
-Class: ${curriculumState.className}
-Stream: ${curriculumState.stream || "General"}
-Subject: ${curriculumState.subject}
-Chapter: ${curriculumState.chapter}
-
-IMPORTANT:
-- Follow ONLY the selected Board, Class, Subject and Chapter.
-- Do not mix another class, board or chapter.
-- Do not reproduce textbook paragraphs.
-- Create original explanations.
-- Use simple language suitable for students.
-- If Hindi terms are useful, include them naturally.
-- Do not invent syllabus-specific facts.
-- If a formula is not relevant, do not force one.
-
-STRUCTURE YOUR RESPONSE EXACTLY LIKE THIS:
-
-# 📚 ${curriculumState.chapter}
-
-## 🎯 Chapter Overview
-Give a short and easy introduction.
-
-## 💡 Core Concepts
-Explain the most important concepts one by one.
-
-## 📖 Important Definitions
-Give important definitions in simple language.
-
-## 🧮 Important Formulas
-Give only relevant formulas.
-For every formula, explain what the symbols mean.
-
-## 🔍 Easy Examples
-Give 2-4 simple examples related to the chapter.
-
-## ⚠️ Common Mistakes
-Give common mistakes students should avoid.
-
-## 📝 Exam Focus
-Give important points that students should remember for board exams.
-
-## ⚡ Quick Revision
-Give exactly 5 short revision points.
-
-## 🎯 Final Tip
-Give one useful study tip for this chapter.
-
-FORMATTING RULES:
-- Use Markdown headings with # and ##.
-- Use bullet points with -.
-- Use **bold** for important words.
-- Put mathematical formulas inside $$formula$$.
-- Keep paragraphs short.
-- Do not write unnecessary greetings or long introductions.
-- Do not mention that you are an AI.
-`;
-
-        if (typeof askAI !== "function") {
-            alert(
-                "AI function available nahi hai. Existing askAI() function check karo."
-            );
-            return;
-        }
-
-        const response = await askAI(prompt);
-
-        /*
-         * Premium Study Notes Renderer
-         */
-
-        if (
-            typeof window.BharatBuddyPremiumNotes === "function"
-        ) {
-
-            const formattedHTML =
-                window.BharatBuddyPremiumNotes(
-                    response,
-                    curriculumState.subject,
-                    curriculumState.chapter
-                );
-
-            showBoardAIResult(
-                formattedHTML,
-                "📚 AI Study Notes"
-            );
-
-        } else {
-
-            showBoardAIResult(
-                response,
-                "📚 AI Study Notes"
-            );
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Board AI Error:",
-            error
-        );
-
-        alert(
-            "AI Notes generate nahi ho paaye. Internet/API check karo."
-        );
-
-    } finally {
-
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-    }
-}
-
-    
-    /* =====================================================
-       CHAPTER TEST
-    ===================================================== */
-
-    async function generateChapterTest() {
-
-        if (
-            !curriculumState.board ||
-            !curriculumState.className ||
-            !curriculumState.subject ||
-            !curriculumState.chapter
-        ) {
-
-            alert(
-                "Pehle Board, Class, Stream, Subject aur Chapter select karo."
-            );
-
-            return;
-        }
-
-        const btn =
-            document.getElementById("bbTestBtn");
-
-        const originalText =
-            btn.innerHTML;
-
-        btn.disabled = true;
-        btn.innerHTML = "⏳ Test prepare ho raha hai...";
-
-        try {
-
-            const prompt = `
-Create a chapter test for BharatBuddy AI.
-
-Board: ${curriculumState.board}
-Class: ${curriculumState.className}
-Stream: ${curriculumState.stream || "General"}
-Subject: ${curriculumState.subject}
-Chapter: ${curriculumState.chapter}
-
-Create:
-- 5 MCQ questions
-- 4 options for each MCQ
-- correct answer
-- short explanation
-
-Questions must be specifically related to the selected chapter.
-Do not mix other classes, boards or chapters.
-
-Return clean readable text.
-`;
-
-            if (typeof askAI === "function") {
-
-                const response =
-                    await askAI(prompt);
-
-                showBoardAIResult(
-                    response,
-                    "📝 Chapter Test"
-                );
-
-            } else {
-
-                alert(
-                    "AI function available nahi hai."
-                );
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Chapter Test Error:",
-                error
-            );
-
-            alert(
-                "Chapter test generate nahi ho paaya."
-            );
-
-        } finally {
-
-            btn.disabled = false;
-            btn.innerHTML = originalText;
-        }
-    }
-
-
-    /* =====================================================
-       AI RESULT DISPLAY
-    ===================================================== */
-
-    function showBoardAIResult(text, title) {
-
-    const pageContent =
-        document.getElementById("pageContent");
-
-    if (!pageContent) return;
-
-    const old =
-        document.getElementById("bbBoardAIResult");
-
-    if (old) old.remove();
-
-    const result =
-        document.createElement("div");
-
-    result.id = "bbBoardAIResult";
-
-    result.style.cssText = `
-        margin-top:20px;
-        padding:24px;
-        border-radius:20px;
-        background:var(--card-bg, #ffffff);
-        border:1px solid var(--border-color, #e1e7f0);
-        box-shadow:0 10px 35px rgba(0,0,0,.08);
-        line-height:1.75;
-        overflow:hidden;
-    `;
-
-    let formattedContent = String(
-        text || "No response"
-    );
-
-    /* Agar Premium Notes formatter available hai */
-    if (
-        typeof window.BharatBuddyPremiumNotes ===
-        "function"
-    ) {
-
-        formattedContent =
-            window.BharatBuddyPremiumNotes(
-                formattedContent,
-                curriculumState?.subject || "",
-                curriculumState?.chapter || ""
-            );
-
-    } else {
-
-        /* Basic Markdown fallback */
-
-        formattedContent =
-            formattedContent
-                .replace(
-                    /&/g,
-                    "&amp;"
-                )
-                .replace(
-                    /</g,
-                    "&lt;"
-                )
-                .replace(
-                    />/g,
-                    "&gt;"
-                );
-
-        formattedContent =
-            formattedContent
-                .replace(
-                    /^### (.*)$/gm,
-                    "<h4>$1</h4>"
-                )
-                .replace(
-                    /^## (.*)$/gm,
-                    "<h3>$1</h3>"
-                )
-                .replace(
-                    /^# (.*)$/gm,
-                    "<h2>$1</h2>"
-                )
-                .replace(
-                    /\*\*(.*?)\*\*/g,
-                    "<strong>$1</strong>"
-                )
-                .replace(
-                    /`([^`]+)`/g,
-                    "<code>$1</code>"
-                )
-                .replace(
-                    /^\s*[-•]\s+(.*)$/gm,
-                    "<li>$1</li>"
-                )
-                .replace(
-                    /\n{2,}/g,
-                    "<br><br>"
-                )
-                .replace(
-                    /\n/g,
-                    "<br>"
-                );
-    }
-
-    result.innerHTML = `
-
-        <div style="
-            margin-bottom:22px;
-            padding-bottom:16px;
-            border-bottom:1px solid var(--border-color, #e5e7eb);
-        ">
-
-            <div style="
-                font-size:13px;
-                font-weight:700;
-                opacity:.65;
-                margin-bottom:5px;
-            ">
-                BHARATBUDDY AI
-            </div>
-
-            <h2 style="
-                margin:0;
-                font-size:26px;
-            ">
-                ${escapeHTML(String(title || "AI Result"))}
-            </h2>
-
-        </div>
-
-        <div class="bb-ai-result-content">
-            ${formattedContent}
-        </div>
-    `;
-
-    pageContent.appendChild(result);
-
-    result.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-    });
-}
-
-    /* =====================================================
-       SAFE STUDY PAGE INTEGRATION
-       Existing openPage/renderStudy remains untouched
-    ===================================================== */
-
-    function tryInjectBoardSystem() {
-
-        const pageContent =
-            document.getElementById("pageContent");
-
-        if (!pageContent) return;
-
-        /*
-          Only add the system when Study page is active.
-        */
-
-        const studyButton =
-            document.querySelector(
-                '[data-page="study"]'
-            );
-
-        if (!studyButton) return;
-
-        const isStudyPage =
-            studyButton.classList.contains("active") ||
-            document.body.dataset.currentPage === "study";
-
-        /*
-          If current app does not expose active state,
-          we still check the page title.
-        */
-
-        const pageTitle =
-            document.getElementById("pageTitle");
-
-        const titleText =
-            pageTitle
-                ? pageTitle.textContent.toLowerCase()
-                : "";
-
-        if (
-            titleText.includes("study") ||
-            titleText.includes("ncert") ||
-            titleText.includes("lesson")
-        ) {
-            createBoardSystem();
-        }
-    }
-
-
-    /* =====================================================
-       INITIALIZATION
-    ===================================================== */
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        function () {
-
-            /*
-              Wait for existing BharatBuddy
-              JavaScript to finish rendering.
-            */
-
-            setTimeout(
-                tryInjectBoardSystem,
-                700
-            );
-
-
-            /*
-              Study button click
-            */
-
-            document.addEventListener(
-                "click",
-                function (event) {
-
-                    const studyButton =
-                        event.target.closest(
-                            '[data-page="study"]'
-                        );
-
-                    if (!studyButton) return;
-
-                    setTimeout(
-                        createBoardSystem,
-                        500
-                    );
-                }
-            );
-
-        }
-    );
-
-
-    /*
-      Public debugging object.
-      Does not interfere with existing BharatBuddyStudy.
-    */
-
-    window.BharatBuddyBoardSystem = {
-        getState: function () {
-            return { ...curriculumState };
-        },
-
-        reset: function () {
-
-            curriculumState = {
-                board: "",
-                className: "",
-                stream: "",
-                subject: "",
-                chapter: ""
-            };
-
-            localStorage.removeItem(
-                BOARD_STORAGE_KEY
-            );
-
-            const system =
-                document.getElementById(
-                    "bharatBuddyBoardSystem"
-                );
-
-            if (system) system.remove();
-        },
-
-        data: boardCurriculum
-    };
-
-})();
-/* ============================================================
-   BHARATBUDDY - PREMIUM AI STUDY NOTES UI
-   SAFE ADD-ON
-   ============================================================ */
-
-(function () {
-    "use strict";
-
-    /* ---------- PREMIUM STUDY PAGE CSS ---------- */
-
-    const style = document.createElement("style");
-
-    style.textContent = `
-    .bb-study-wrapper {
-        max-width: 1100px;
-        margin: 0 auto;
-        padding: 10px 4px 50px;
-    }
-
-    .bb-study-hero {
-        background: linear-gradient(135deg, #eef4ff, #f8fbff);
-        border: 1px solid #dbe6ff;
-        border-radius: 24px;
-        padding: 28px;
-        margin-bottom: 22px;
-        box-shadow: 0 10px 30px rgba(40, 80, 160, 0.08);
-    }
-
-    .bb-study-hero .bb-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: #ffffff;
-        border: 1px solid #dce5ff;
-        border-radius: 999px;
-        padding: 7px 13px;
-        font-size: 13px;
-        font-weight: 700;
-        margin-bottom: 14px;
-    }
-
-    .bb-study-hero h1 {
-        margin: 0 0 10px;
-        font-size: clamp(25px, 4vw, 38px);
-        line-height: 1.2;
-    }
-
-    .bb-study-hero p {
-        margin: 0;
-        color: #5d6878;
-        line-height: 1.7;
-        font-size: 15px;
-    }
-
-    .bb-note-card {
-        background: #ffffff;
-        border: 1px solid #e5e9f0;
-        border-radius: 20px;
-        padding: 23px;
-        margin: 16px 0;
-        box-shadow: 0 7px 25px rgba(0, 0, 0, 0.045);
-    }
-
-    .bb-note-card h2 {
-        margin-top: 0;
-        font-size: 22px;
-    }
-
-    .bb-note-card h3 {
-        margin-top: 24px;
-        font-size: 18px;
-    }
-
-    .bb-note-card p,
-    .bb-note-card li {
-        line-height: 1.75;
-        color: #394454;
-    }
-
-    .bb-note-card strong {
-        font-weight: 800;
-    }
-
-    .bb-important {
-        border-left: 5px solid #4f7cff;
-        background: #f4f7ff;
-        border-radius: 14px;
-        padding: 16px 18px;
-        margin: 18px 0;
-    }
-
-    .bb-formula {
-        background: #f8f5ff;
-        border: 1px solid #e5dcff;
-        border-radius: 16px;
-        padding: 18px;
-        margin: 18px 0;
-        overflow-x: auto;
-        text-align: center;
-        font-size: 17px;
-        font-weight: 700;
-    }
-
-    .bb-quick {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-        gap: 14px;
-        margin: 20px 0;
-    }
-
-    .bb-quick-item {
-        background: #fff;
-        border: 1px solid #e7eaf0;
-        border-radius: 16px;
-        padding: 17px;
-    }
-
-    .bb-quick-item strong {
-        display: block;
-        margin-bottom: 7px;
-    }
-
-    .bb-study-footer {
-        margin-top: 25px;
-        padding: 20px;
-        border-radius: 18px;
-        background: #f8fafc;
-        border: 1px dashed #d8dee8;
-        text-align: center;
-    }
-
-    .bb-study-footer strong {
-        display: block;
-        margin-bottom: 6px;
-    }
-
-    @media (max-width: 700px) {
-        .bb-study-wrapper {
-            padding: 5px 0 35px;
-        }
-
-        .bb-study-hero,
-        .bb-note-card {
-            border-radius: 17px;
-            padding: 18px;
-        }
-
-        .bb-study-hero h1 {
-            font-size: 26px;
-        }
-
-        .bb-note-card h2 {
-            font-size: 20px;
-        }
-    }
-
-    /* DARK MODE */
-
-    body.dark-mode .bb-study-hero,
-    body.dark .bb-study-hero {
-        background: #171b24;
-        border-color: #293142;
-    }
-
-    body.dark-mode .bb-study-hero p,
-    body.dark .bb-study-hero p {
-        color: #b8c0ce;
-    }
-
-    body.dark-mode .bb-note-card,
-    body.dark .bb-note-card,
-    body.dark-mode .bb-quick-item,
-    body.dark .bb-quick-item {
-        background: #171b24;
-        border-color: #293142;
-    }
-
-    body.dark-mode .bb-note-card p,
-    body.dark .bb-note-card p,
-    body.dark-mode .bb-note-card li,
-    body.dark .bb-note-card li {
-        color: #d1d7e0;
-    }
-
-    body.dark-mode .bb-important,
-    body.dark .bb-important {
-        background: #1b2232;
-    }
-
-    body.dark-mode .bb-formula,
-    body.dark .bb-formula {
-        background: #211d31;
-        border-color: #3b3455;
-    }
-
-    body.dark-mode .bb-study-footer,
-    body.dark .bb-study-footer {
-        background: #171b24;
-        border-color: #343b49;
-    }
-    `;
-
-    document.head.appendChild(style);
-
-
-    /* ---------- MARKDOWN CLEANER ---------- */
-
-    function cleanMarkdown(text) {
-
-        if (!text) return "";
-
-        let html = String(text);
-
-        /* headings */
-
-        html = html.replace(
-            /^###\s+(.+)$/gm,
-            '<h3>$1</h3>'
-        );
-
-        html = html.replace(
-            /^##\s+(.+)$/gm,
-            '<h2>$1</h2>'
-        );
-
-        html = html.replace(
-            /^#\s+(.+)$/gm,
-            '<h2>$1</h2>'
-        );
-
-        /* bold */
-
-        html = html.replace(
-            /\*\*(.*?)\*\*/g,
-            '<strong>$1</strong>'
-        );
-
-        /* italic */
-
-        html = html.replace(
-            /(?<!\*)\*([^*\n]+)\*(?!\*)/g,
-            '<em>$1</em>'
-        );
-
-        /* horizontal line */
-
-        html = html.replace(
-            /^\s*---+\s*$/gm,
-            '<hr>'
-        );
-
-        /* formulas */
-
-        html = html.replace(
-            /\$\$(.*?)\$\$/gs,
-            '<div class="bb-formula">$1</div>'
-        );
-
-        html = html.replace(
-            /\\\((.*?)\\\)/gs,
-            '<span class="bb-formula">$1</span>'
-        );
-
-        /* bullet points */
-
-        html = html.replace(
-            /^[ \t]*[-*]\s+(.+)$/gm,
-            '<li>$1</li>'
-        );
-
-        /* numbered points */
-
-        html = html.replace(
-            /^[ \t]*\d+\.\s+(.+)$/gm,
-            '<li>$1</li>'
-        );
-
-        /* group consecutive li */
-
-        html = html.replace(
-            /((?:<li>.*?<\/li>\s*)+)/gs,
-            '<ul>$1</ul>'
-        );
-
-        /* paragraphs */
-
-        html = html.replace(
-            /\n{2,}/g,
-            '</p><p>'
-        );
-
-        html = '<p>' + html + '</p>';
-
-        /* remove paragraph around block elements */
-
-        html = html.replace(
-            /<p>\s*(<h[23]>)/g,
-            '$1'
-        );
-
-        html = html.replace(
-            /(<\/h[23]>)\s*<\/p>/g,
-            '$1'
-        );
-
-        html = html.replace(
-            /<p>\s*(<ul>)/g,
-            '$1'
-        );
-
-        html = html.replace(
-            /(<\/ul>)\s*<\/p>/g,
-            '$1'
-        );
-
-        html = html.replace(
-            /<p>\s*(<div class="bb-formula">)/g,
-            '$1'
-        );
-
-        html = html.replace(
-            /(<\/div>)\s*<\/p>/g,
-            '$1'
-        );
-
-        return html;
-    }
-
-
-    /* ---------- MAKE AI NOTES BEAUTIFUL ---------- */
-
-    window.BharatBuddyPremiumNotes = function (rawText, subject, chapter) {
-
-        const safeSubject = subject || "Subject";
-        const safeChapter = chapter || "Chapter";
-
-        const formatted = cleanMarkdown(rawText);
-
-        return `
-            <div class="bb-study-wrapper">
-
-                <div class="bb-study-hero">
-
-                    <div class="bb-badge">
-                        🤖 BharatBuddy AI
-                    </div>
-
-                    <h1>📚 ${safeChapter}</h1>
-
-                    <p>
-                        ${safeSubject} • Smart Study Notes
-                    </p>
-
-                    <p style="margin-top:10px;">
-                        Easy explanation, important concepts,
-                        formulas and quick revision — all in one place.
-                    </p>
-
-                </div>
-
-                <div class="bb-note-card">
-
-                    ${formatted}
-
-                </div>
-
-                <div class="bb-study-footer">
-
-                    <strong>🎯 Quick Study Tip</strong>
-
-                    Read one concept, understand the example,
-                    then try a question without looking at the answer.
-
-                </div>
-
-            </div>
-        `;
-    };
-
-
-    /* ---------- GLOBAL HELPER ---------- */
-
-    window.BharatBuddyFormatNotes = function (element, subject, chapter) {
-
-        if (!element) return;
-
-        const originalText = element.innerText || element.textContent || "";
-
-        if (!originalText.trim()) return;
-
-        element.innerHTML =
-            window.BharatBuddyPremiumNotes(
-                originalText,
-                subject,
-                chapter
-            );
-    };
-
-
-    console.log("BharatBuddy Premium Study Notes UI loaded");
-
-})();
-/* =========================================================
-   BHARATBUDDY - TODAY'S MISSION
-   SAFE ADD-ON
-========================================================= */
-
-(function () {
-
-    "use strict";
-
-    function getTodayKey() {
-        const d = new Date();
-        return (
-            d.getFullYear() +
-            "-" +
-            String(d.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(d.getDate()).padStart(2, "0")
-        );
-    }
-
-    function getMissionData() {
-
-        const key = "bharatbuddy_today_mission";
-
-        let data;
-
-        try {
-            data = JSON.parse(
-                localStorage.getItem(key)
-            );
-        } catch (e) {
-            data = null;
-        }
-
-        if (
-            !data ||
-            data.date !== getTodayKey()
-        ) {
-
-            data = {
-                date: getTodayKey(),
-                completed: [],
-                xp: 0
-            };
-
-            localStorage.setItem(
-                key,
-                JSON.stringify(data)
-            );
-        }
-
-        return data;
-    }
-
-    function saveMissionData(data) {
-
-        localStorage.setItem(
-            "bharatbuddy_today_mission",
-            JSON.stringify(data)
-        );
-    }
-
-    function completeMission(id, xp) {
-
-        const data = getMissionData();
-
-        if (data.completed.includes(id)) {
-            return;
-        }
-
-        data.completed.push(id);
-        data.xp += xp;
-
-        saveMissionData(data);
-
-        renderMission();
-
-        if (
-            typeof showToast === "function"
-        ) {
-            showToast(
-                `🎉 Mission complete! +${xp} XP`
-            );
-        }
-    }
-
-    function renderMission() {
-
-        const pageContent =
-            document.getElementById(
-                "pageContent"
-            );
-
-        if (!pageContent) return;
-
-        const data = getMissionData();
-
-        const missions = [
-
-            {
-                id: "learn",
-                icon: "📚",
-                title: "Learn Something",
-                description:
-                    "Study one lesson for 10 minutes.",
-                xp: 20
-            },
-
-            {
-                id: "quiz",
-                icon: "🧠",
-                title: "Quick Quiz",
-                description:
-                    "Answer 5 practice questions.",
-                xp: 30
-            },
-
-            {
-                id: "explore",
-                icon: "💡",
-                title: "Explore",
-                description:
-                    "Ask BharatBuddy one useful doubt.",
-                xp: 20
-            }
-
-        ];
-
-        const completedCount =
-            data.completed.length;
-
-        const progress =
-            Math.round(
-                (completedCount / missions.length) *
-                100
-            );
-
-        const cards =
-            missions.map(function (mission) {
-
-                const completed =
-                    data.completed.includes(
-                        mission.id
-                    );
-
-                return `
-
-                    <div
-                        class="bb-mission-card
-                        ${completed ? "completed" : ""}"
-                        data-mission-id="${mission.id}"
-                        data-mission-xp="${mission.xp}"
-                    >
-
-                        <div class="bb-mission-icon">
-                            ${mission.icon}
-                        </div>
-
-                        <div class="bb-mission-info">
-
-                            <div class="bb-mission-title">
-                                ${mission.title}
-                            </div>
-
-                            <div class="bb-mission-description">
-                                ${mission.description}
-                            </div>
-
-                        </div>
-
-                        <div class="bb-mission-xp">
-                            ${completed
-                                ? "✓ Done"
-                                : "+" + mission.xp + " XP"}
-                        </div>
-
-                    </div>
-                `;
-            }).join("");
-
-        const existing =
-            document.getElementById(
-                "bbTodayMission"
-            );
-
-        if (existing) {
-            existing.remove();
-        }
-
-        const section =
-            document.createElement("div");
-
-        section.id =
-            "bbTodayMission";
-
-        section.innerHTML = `
-
-            <div class="bb-mission-header">
-
-                <div>
-
-                    <div class="bb-mission-label">
-                        🎯 TODAY'S MISSION
-                    </div>
-
-                    <h2>
-                        Aaj kya seekhenge?
-                    </h2>
-
-                    <p>
-                        Chhote steps. Better learning. 🚀
-                    </p>
-
-                </div>
-
-                <div class="bb-xp-box">
-
-                    <strong>
-                        ${data.xp}
-                    </strong>
-
-                    <span>XP</span>
-
-                </div>
-
-            </div>
-
-            <div class="bb-mission-progress">
-
-                <div class="bb-progress-top">
-
-                    <span>
-                        Daily Progress
-                    </span>
-
-                    <strong>
-                        ${progress}%
-                    </strong>
-
-                </div>
-
-                <div class="bb-progress-bar">
-
-                    <div
-                        style="width:${progress}%"
-                    ></div>
-
-                </div>
-
-            </div>
-
-            <div class="bb-mission-list">
-
-                ${cards}
-
-            </div>
-
-            ${
-                completedCount === missions.length
-                    ? `
-                        <div class="bb-mission-complete">
-                            🏆 Amazing! Aaj ke saare missions complete!
-                        </div>
-                    `
-                    : ""
-            }
-
-        `;
-
-        pageContent.prepend(section);
-
-        section
-            .querySelectorAll(
-                ".bb-mission-card"
-            )
-            .forEach(function (card) {
-
-                card.addEventListener(
-                    "click",
-                    function () {
-
-                        const id =
-                            this.dataset.missionId;
-
-                        const xp =
-                            Number(
-                                this.dataset.missionXp
-                            );
-
-                        completeMission(
-                            id,
-                            xp
-                        );
-
-                    }
-                );
-
-            });
-    }
-
-    function addMissionCSS() {
-
-        if (
-            document.getElementById(
-                "bbMissionCSS"
-            )
-        ) return;
-
-        const style =
-            document.createElement("style");
-
-        style.id =
-            "bbMissionCSS";
-
-        style.textContent = `
-
-            #bbTodayMission {
-                margin-bottom:24px;
-            }
-
-            .bb-mission-header {
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                gap:20px;
-                padding:26px;
-                border-radius:24px;
-                background:
-                    linear-gradient(
-                        135deg,
-                        #eef4ff,
-                        #f8fbff
-                    );
-                border:1px solid #dce6f5;
-                margin-bottom:16px;
-            }
-
-            .bb-mission-label {
-                font-size:12px;
-                font-weight:800;
-                letter-spacing:1px;
-                color:#4169e1;
-                margin-bottom:7px;
-            }
-
-            .bb-mission-header h2 {
-                margin:0;
-                font-size:28px;
-            }
-
-            .bb-mission-header p {
-                margin:6px 0 0;
-                opacity:.7;
-            }
-
-            .bb-xp-box {
-                min-width:75px;
-                text-align:center;
-                padding:14px;
-                border-radius:18px;
-                background:#ffffff;
-                box-shadow:0 8px 25px rgba(0,0,0,.07);
-            }
-
-            .bb-xp-box strong {
-                display:block;
-                font-size:26px;
-            }
-
-            .bb-xp-box span {
-                font-size:12px;
-                font-weight:700;
-                opacity:.6;
-            }
-
-            .bb-mission-progress {
-                padding:18px;
-                border-radius:18px;
-                background:#ffffff;
-                border:1px solid #e4e9f1;
-                margin-bottom:16px;
-            }
-
-            .bb-progress-top {
-                display:flex;
-                justify-content:space-between;
-                margin-bottom:10px;
-                font-size:14px;
-            }
-
-            .bb-progress-bar {
-                height:10px;
-                background:#e9edf3;
-                border-radius:20px;
-                overflow:hidden;
-            }
-
-            .bb-progress-bar div {
-                height:100%;
-                background:linear-gradient(
-                    90deg,
-                    #4169e1,
-                    #7c5cff
-                );
-                border-radius:20px;
-                transition:width .4s ease;
-            }
-
-            .bb-mission-list {
-                display:grid;
-                gap:12px;
-            }
-
-            .bb-mission-card {
-                display:flex;
-                align-items:center;
-                gap:15px;
-                padding:18px;
-                border-radius:18px;
-                background:#ffffff;
-                border:1px solid #e3e8f0;
-                cursor:pointer;
-                transition:
-                    transform .2s ease,
-                    box-shadow .2s ease;
-            }
-
-            .bb-mission-card:hover {
-                transform:translateY(-2px);
-                box-shadow:
-                    0 10px 25px rgba(0,0,0,.08);
-            }
-
-            .bb-mission-card.completed {
-                opacity:.65;
-                cursor:default;
-            }
-
-            .bb-mission-icon {
-                width:48px;
-                height:48px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                border-radius:15px;
-                background:#f0f4ff;
-                font-size:23px;
-                flex-shrink:0;
-            }
-
-            .bb-mission-info {
-                flex:1;
-            }
-
-            .bb-mission-title {
-                font-weight:800;
-                margin-bottom:3px;
-            }
-
-            .bb-mission-description {
-                font-size:13px;
-                opacity:.65;
-            }
-
-            .bb-mission-xp {
-                font-size:13px;
-                font-weight:800;
-                white-space:nowrap;
-            }
-
-            .bb-mission-complete {
-                margin-top:16px;
-                padding:18px;
-                text-align:center;
-                border-radius:18px;
-                background:#eefaf1;
-                border:1px solid #ccebd3;
-                font-weight:800;
-            }
-
-            @media (max-width:600px) {
-
-                .bb-mission-header {
-                    padding:20px;
-                }
-
-                .bb-mission-header h2 {
-                    font-size:22px;
-                }
-
-                .bb-mission-card {
-                    padding:14px;
-                }
-
-                .bb-mission-xp {
-                    font-size:11px;
-                }
-
-            }
-
-        `;
-
-        document.head.appendChild(style);
-    }
-
-    function initMission() {
-
-    addMissionCSS();
-
-    setTimeout(function () {
-
-        const pageContent =
-            document.getElementById("pageContent");
-
-        if (
-            pageContent &&
-            typeof renderMission === "function"
-        ) {
-            renderMission();
-        }
-
-    }, 300);
-}
-
-        }
-    );
-
-/* =========================================================
-   BHARATBUDDY - XP + DAILY STREAK
-   SAFE ADD-ON
-========================================================= */
-
-(function () {
-
-    "use strict";
-
-    const XP_KEY = "bharatbuddy_xp_system";
-
-    function getXPData() {
-
-        let data = null;
-
-        try {
-            data = JSON.parse(
-                localStorage.getItem(XP_KEY)
-            );
-        } catch (error) {
-            data = null;
-        }
-
-        if (!data) {
-
-            data = {
-                xp: 0,
-                streak: 0,
-                lastActiveDate: ""
-            };
-
-            localStorage.setItem(
-                XP_KEY,
-                JSON.stringify(data)
-            );
-        }
-
-        return data;
-    }
-
-    function saveXPData(data) {
-
-        localStorage.setItem(
-            XP_KEY,
-            JSON.stringify(data)
-        );
-    }
-
-    function today() {
-
-        const d = new Date();
-
-        return (
-            d.getFullYear() +
-            "-" +
-            String(d.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(d.getDate()).padStart(2, "0")
-        );
-    }
-
-    function yesterday() {
-
-        const d = new Date();
-
-        d.setDate(
-            d.getDate() - 1
-        );
-
-        return (
-            d.getFullYear() +
-            "-" +
-            String(d.getMonth() + 1).padStart(2, "0") +
-            "-" +
-            String(d.getDate()).padStart(2, "0")
-        );
-    }
-
-    function updateStreak() {
-
-        const data = getXPData();
-
-        const current =
-            today();
-
-        if (
-            data.lastActiveDate === current
-        ) {
-            return data;
-        }
-
-        if (
-            data.lastActiveDate === yesterday()
-        ) {
-
-            data.streak =
-                Math.max(
-                    1,
-                    data.streak + 1
-                );
-
-        } else {
-
-            data.streak = 1;
-        }
-
-        data.lastActiveDate =
-            current;
-
-        saveXPData(data);
-
-        return data;
-    }
-
-    function addXP(amount) {
-
-        const data =
-            updateStreak();
-
-        data.xp += Number(amount) || 0;
-
-        saveXPData(data);
-
-        return data;
-    }
-
-    function createXPCard() {
-
-        const home =
-            document.getElementById(
-                "pageContent"
-            );
-
-        if (!home) return;
-
-        const old =
-            document.getElementById(
-                "bbXPCard"
-            );
-
-        if (old) old.remove();
-
-        const data =
-            updateStreak();
-
-        const card =
-            document.createElement("div");
-
-        card.id =
-            "bbXPCard";
-
-        card.innerHTML = `
-
-            <div class="bb-xp-main">
-
-                <div class="bb-xp-icon">
-                    ⚡
-                </div>
-
-                <div>
-
-                    <div class="bb-xp-label">
-                        YOUR LEARNING XP
-                    </div>
-
-                    <div class="bb-xp-number">
-                        ${data.xp} XP
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="bb-streak-box">
-
-                <div class="bb-fire">
-                    🔥
-                </div>
-
-                <div>
-
-                    <strong>
-                        ${data.streak}
-                    </strong>
-
-                    <span>
-                        Day Streak
-                    </span>
-
-                </div>
-
-            </div>
-        `;
-
-        home.prepend(card);
-    }
-
-    function addXPStyle() {
-
-        if (
-            document.getElementById(
-                "bbXPStyle"
-            )
-        ) return;
-
-        const style =
-            document.createElement("style");
-
-        style.id =
-            "bbXPStyle";
-
-        style.textContent = `
-
-            #bbXPCard {
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                gap:20px;
-                padding:20px;
-                margin-bottom:18px;
-                border-radius:22px;
-                background:
-                    linear-gradient(
-                        135deg,
-                        #fff7e6,
-                        #ffffff
-                    );
-                border:1px solid #f0dfb8;
-                box-shadow:
-                    0 8px 28px rgba(0,0,0,.06);
-            }
-
-            .bb-xp-main {
-                display:flex;
-                align-items:center;
-                gap:14px;
-            }
-
-            .bb-xp-icon {
-                width:52px;
-                height:52px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                border-radius:16px;
-                background:#fff0c7;
-                font-size:25px;
-            }
-
-            .bb-xp-label {
-                font-size:11px;
-                font-weight:800;
-                letter-spacing:1px;
-                opacity:.55;
-            }
-
-            .bb-xp-number {
-                font-size:24px;
-                font-weight:900;
-                margin-top:3px;
-            }
-
-            .bb-streak-box {
-                display:flex;
-                align-items:center;
-                gap:10px;
-                padding:10px 16px;
-                border-radius:16px;
-                background:#fff;
-                border:1px solid #eee4d0;
-            }
-
-            .bb-fire {
-                font-size:25px;
-            }
-
-            .bb-streak-box strong {
-                display:block;
-                font-size:20px;
-            }
-
-            .bb-streak-box span {
-                display:block;
-                font-size:11px;
-                opacity:.6;
-                font-weight:700;
-            }
-
-            @media (max-width:600px) {
-
-                #bbXPCard {
-                    padding:16px;
-                }
-
-                .bb-xp-number {
-                    font-size:20px;
-                }
-
-                .bb-streak-box {
-                    padding:8px 10px;
-                }
-
-            }
-
-        `;
-
-        document.head.appendChild(style);
-    }
-
-    function initXPSystem() {
-
-        addXPStyle();
-
-        setTimeout(
-            createXPCard,
-            500
-        );
-    }
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        initXPSystem
-    );
-
-    document.addEventListener(
-        "click",
-        function (event) {
-
-            const homeButton =
-                event.target.closest(
-                    '[data-page="home"]'
-                );
-
-            if (homeButton) {
-
-                setTimeout(
-                    createXPCard,
-                    400
-                );
-            }
-
-        }
-    );
-
-    window.BharatBuddyXP = {
-        getData: getXPData,
-        addXP: addXP,
-        updateStreak: updateStreak
-    };
-
-})();
-/* =========================================================
-   BHARATBUDDY CLASS 9-10 CURRICULUM ENGINE
-   CBSE + BSEB
-   Science / Social Science
-========================================================= */
-
-(function () {
-    "use strict";
-
-    const BB_CLASS9_10_CURRICULUM = {
-
-        CBSE: {
-
-            "9": {
-
-                "Science": {
-
-                    "Physics": {
-                        chapters: [
-                            "Motion",
-                            "Force and Laws of Motion",
-                            "Gravitation",
-                            "Work and Energy",
-                            "Sound"
-                        ]
-                    },
-
-                    "Chemistry": {
-                        chapters: [
-                            "Matter in Our Surroundings",
-                            "Is Matter Around Us Pure",
-                            "Atoms and Molecules",
-                            "Structure of the Atom"
-                        ]
-                    },
-
-                    "Biology": {
-                        chapters: [
-                            "The Fundamental Unit of Life",
-                            "Tissues",
-                            "Diversity in Living Organisms",
-                            "Why Do We Fall Ill",
-                            "Natural Resources",
-                            "Improvement in Food Resources"
-                        ]
-                    }
-
-                },
-
-                "Social Science": {
-
-                    "History": {
-                        chapters: [
-                            "The French Revolution",
-                            "Socialism in Europe and the Russian Revolution",
-                            "Nazism and the Rise of Hitler",
-                            "Forest Society and Colonialism",
-                            "Pastoralists in the Modern World"
-                        ]
-                    },
-
-                    "Geography": {
-                        chapters: [
-                            "India – Size and Location",
-                            "Physical Features of India",
-                            "Drainage",
-                            "Climate",
-                            "Natural Vegetation and Wildlife",
-                            "Population"
-                        ]
-                    },
-
-                    "Political Science": {
-                        chapters: [
-                            "What is Democracy? Why Democracy?",
-                            "Constitutional Design",
-                            "Electoral Politics",
-                            "Working of Institutions",
-                            "Democratic Rights"
-                        ]
-                    },
-
-                    "Economics": {
-                        chapters: [
-                            "The Story of Village Palampur",
-                            "People as Resource",
-                            "Poverty as a Challenge",
-                            "Food Security in India"
-                        ]
-                    }
-
-                }
-
-            },
-
-            "10": {
-
-                "Science": {
-
-                    "Physics": {
-                        chapters: [
-                            "Light – Reflection and Refraction",
-                            "The Human Eye and the Colourful World",
-                            "Electricity",
-                            "Magnetic Effects of Electric Current",
-                            "Sources of Energy"
-                        ]
-                    },
-
-                    "Chemistry": {
-                        chapters: [
-                            "Chemical Reactions and Equations",
-                            "Acids, Bases and Salts",
-                            "Metals and Non-metals",
-                            "Carbon and Its Compounds",
-                            "Periodic Classification of Elements"
-                        ]
-                    },
-
-                    "Biology": {
-                        chapters: [
-                            "Life Processes",
-                            "Control and Coordination",
-                            "How Do Organisms Reproduce?",
-                            "Heredity",
-                            "Our Environment",
-                            "Sustainable Management of Natural Resources"
-                        ]
-                    }
-
-                },
-
-                "Social Science": {
-
-                    "History": {
-                        chapters: [
-                            "The Rise of Nationalism in Europe",
-                            "Nationalism in India",
-                            "The Making of a Global World",
-                            "The Age of Industrialisation",
-                            "Print Culture and the Modern World"
-                        ]
-                    },
-
-                    "Geography": {
-                        chapters: [
-                            "Resources and Development",
-                            "Forest and Wildlife Resources",
-                            "Water Resources",
-                            "Agriculture",
-                            "Minerals and Energy Resources",
-                            "Manufacturing Industries",
-                            "Lifelines of National Economy"
-                        ]
-                    },
-
-                    "Political Science": {
-                        chapters: [
-                            "Power Sharing",
-                            "Federalism",
-                            "Gender, Religion and Caste",
-                            "Political Parties",
-                            "Outcomes of Democracy",
-                            "Challenges to Democracy"
-                        ]
-                    },
-
-                    "Economics": {
-                        chapters: [
-                            "Development",
-                            "Sectors of the Indian Economy",
-                            "Money and Credit",
-                            "Globalisation and the Indian Economy",
-                            "Consumer Rights"
-                        ]
-                    }
-
-                }
-
-            }
-
-        },
-
-        /*
-         * BSEB
-         * Official BSEB curriculum availability currently needs
-         * board-year verification before we lock every chapter.
-         * The structure is ready so chapters can be inserted safely.
-         */
-
-        BSEB: {
-
-            "9": {
-                "Science": {
-                    "Physics": { chapters: [] },
-                    "Chemistry": { chapters: [] },
-                    "Biology": { chapters: [] }
-                },
-
-                "Social Science": {
-                    "History": { chapters: [] },
-                    "Geography": { chapters: [] },
-                    "Political Science": { chapters: [] },
-                    "Economics": { chapters: [] }
-                }
-            },
-
-            "10": {
-                "Science": {
-                    "Physics": { chapters: [] },
-                    "Chemistry": { chapters: [] },
-                    "Biology": { chapters: [] }
-                },
-
-                "Social Science": {
-                    "History": { chapters: [] },
-                    "Geography": { chapters: [] },
-                    "Political Science": { chapters: [] },
-                    "Economics": { chapters: [] }
-                }
-            }
-
-        }
-
-    };
-
-
-    /* =========================================================
-       GET CURRICULUM
-    ========================================================= */
-
-    window.BharatBuddyClass9_10 = {
-
-        data: BB_CLASS9_10_CURRICULUM,
-
-        getSubjects: function (board, className) {
-
-            const data =
-                BB_CLASS9_10_CURRICULUM?.[board]?.[className];
-
-            if (!data) return [];
-
-            return Object.keys(data);
-        },
-
-        getBooks: function (board, className, subject) {
-
-            const data =
-                BB_CLASS9_10_CURRICULUM?.[board]?.[className]?.[subject];
-
-            if (!data) return [];
-
-            return Object.keys(data);
-        },
-
-        getChapters: function (
-            board,
-            className,
-            subject,
-            book
-        ) {
-
-            return (
-                BB_CLASS9_10_CURRICULUM
-                    ?.[board]
-                    ?.[className]
-                    ?.[subject]
-                    ?.[book]
-                    ?.chapters || []
-            );
-        }
-
-    };
-
-
-    console.log(
-        "BharatBuddy Class 9-10 Curriculum Engine Loaded"
-    );
-
-})();
-/* =========================================================
-   BHARATBUDDY 9-10 STUDY SELECTOR
-   Board → Class → Subject → Book → Chapter
-========================================================= */
-
-(function () {
-    "use strict";
-
-    function initClass9_10StudySelector() {
-
-        const pageContent = document.getElementById("pageContent");
-
-        if (!pageContent) return;
-
-        const currentClass =
-            window.BharatBuddyBoardSystem?.getState?.()?.className ||
-            window.bharatBuddyData?.profile?.className ||
-            "";
-
-        // Sirf Class 9 aur 10 ke liye
-        if (
-            !String(currentClass).includes("9") &&
-            !String(currentClass).includes("10")
-        ) {
-            return;
-        }
-
-        renderClass9_10Selector(pageContent);
-    }
-
-
-    function renderClass9_10Selector(container) {
-
-        container.innerHTML = `
-            <div class="bb-910-study-box">
-
-                <div class="bb-910-header">
-                    <div>
-                        <span class="bb-910-badge">CLASS 9–10</span>
-                        <h2>📚 Study Center</h2>
-                        <p>
-                            Board, class, subject aur chapter select karke
-                            directly padhna start karo.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="bb-910-select-grid">
-
-                    <div class="bb-910-field">
-                        <label>Board</label>
-                        <select id="bb910Board">
-                            <option value="">Select Board</option>
-                            <option value="CBSE">CBSE</option>
-                            <option value="BSEB">BSEB</option>
-                        </select>
-                    </div>
-
-                    <div class="bb-910-field">
-                        <label>Class</label>
-                        <select id="bb910Class">
-                            <option value="">Select Class</option>
-                            <option value="9">Class 9</option>
-                            <option value="10">Class 10</option>
-                        </select>
-                    </div>
-
-                    <div class="bb-910-field">
-                        <label>Subject</label>
-                        <select id="bb910Subject" disabled>
-                            <option value="">Select Subject</option>
-                        </select>
-                    </div>
-
-                    <div class="bb-910-field">
-                        <label>Book / Section</label>
-                        <select id="bb910Book" disabled>
-                            <option value="">Select Book / Section</option>
-                        </select>
-                    </div>
-
-                    <div class="bb-910-field bb-910-full">
-                        <label>Chapter</label>
-                        <select id="bb910Chapter" disabled>
-                            <option value="">Select Chapter</option>
-                        </select>
-                    </div>
-
-                </div>
-
-                <div id="bb910ChapterArea"></div>
-
-            </div>
-        `;
-
-        addClass910Styles();
-
-        setupClass910Events();
-    }
-
-
-    function setupClass910Events() {
-
-        const board =
-            document.getElementById("bb910Board");
-
-        const classSelect =
-            document.getElementById("bb910Class");
-
-        const subject =
-            document.getElementById("bb910Subject");
-
-        const book =
-            document.getElementById("bb910Book");
-
-        const chapter =
-            document.getElementById("bb910Chapter");
-
-        const chapterArea =
-            document.getElementById("bb910ChapterArea");
-
-
-        function loadSubjects() {
-
-            subject.innerHTML =
-                `<option value="">Select Subject</option>`;
-
-            book.innerHTML =
-                `<option value="">Select Book / Section</option>`;
-
-            chapter.innerHTML =
-                `<option value="">Select Chapter</option>`;
-
-            subject.disabled = true;
-            book.disabled = true;
-            chapter.disabled = true;
-
-            chapterArea.innerHTML = "";
-
-            if (!board.value || !classSelect.value) return;
-
-            const subjects =
-                window.BharatBuddyClass9_10
-                    ?.getSubjects(
-                        board.value,
-                        classSelect.value
-                    ) || [];
-
-            subjects.forEach(function (item) {
-
-                const option =
-                    document.createElement("option");
-
-                option.value = item;
-                option.textContent = item;
-
-                subject.appendChild(option);
-            });
-
-            subject.disabled = subjects.length === 0;
-        }
-
-
-        function loadBooks() {
-
-            book.innerHTML =
-                `<option value="">Select Book / Section</option>`;
-
-            chapter.innerHTML =
-                `<option value="">Select Chapter</option>`;
-
-            book.disabled = true;
-            chapter.disabled = true;
-
-            chapterArea.innerHTML = "";
-
-            if (!board.value ||
-                !classSelect.value ||
-                !subject.value) return;
-
-            const books =
-                window.BharatBuddyClass9_10
-                    ?.getBooks(
-                        board.value,
-                        classSelect.value,
-                        subject.value
-                    ) || [];
-
-            books.forEach(function (item) {
-
-                const option =
-                    document.createElement("option");
-
-                option.value = item;
-                option.textContent = item;
-
-                book.appendChild(option);
-            });
-
-            book.disabled = books.length === 0;
-        }
-
-
-        function loadChapters() {
-
-            chapter.innerHTML =
-                `<option value="">Select Chapter</option>`;
-
-            chapter.disabled = true;
-
-            chapterArea.innerHTML = "";
-
-            if (!board.value ||
-                !classSelect.value ||
-                !subject.value ||
-                !book.value) return;
-
-            const chapters =
-                window.BharatBuddyClass9_10
-                    ?.getChapters(
-                        board.value,
-                        classSelect.value,
-                        subject.value,
-                        book.value
-                    ) || [];
-
-            chapters.forEach(function (item, index) {
-
-                const option =
-                    document.createElement("option");
-
-                option.value = item;
-                option.textContent =
-                    `Chapter ${index + 1}: ${item}`;
-
-                chapter.appendChild(option);
-            });
-
-            chapter.disabled = chapters.length === 0;
-
-            if (chapters.length === 0) {
-
-                chapterArea.innerHTML = `
-                    <div class="bb910-empty">
-                        📚 Is board/class ke chapters abhi
-                        curriculum data mein add nahi hue hain.
-                    </div>
-                `;
-            }
-        }
-
-
-        function showChapter() {
-
-            if (!chapter.value) {
-
-                chapterArea.innerHTML = "";
-
-                return;
-            }
-
-            const chapterName = chapter.value;
-
-            chapterArea.innerHTML = `
-
-                <div class="bb910-chapter-card">
-
-                    <div class="bb910-chapter-icon">
-                        📖
-                    </div>
-
-                    <div class="bb910-chapter-info">
-
-                        <span>
-                            ${board.value} • Class ${classSelect.value}
-                        </span>
-
-                        <h3>${chapterName}</h3>
-
-                        <p>
-                            ${book.value} • ${subject.value}
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="bb910-action-grid">
-
-                    <button
-                        class="bb910-action"
-                        id="bb910StudyBtn"
-                    >
-                        📚 Study Chapter
-                    </button>
-
-                    <button
-                        class="bb910-action"
-                        id="bb910QuestionBtn"
-                    >
-                        📝 Chapter Questions
-                    </button>
-
-                </div>
-            `;
-
-
-            document.getElementById("bb910StudyBtn")
-                ?.addEventListener("click", function () {
-
-                    open910AIStudy(
-                        board.value,
-                        classSelect.value,
-                        subject.value,
-                        book.value,
-                        chapterName
-                    );
-
-                });
-
-
-            document.getElementById("bb910QuestionBtn")
-                ?.addEventListener("click", function () {
-
-                    open910Questions(
-                        board.value,
-                        classSelect.value,
-                        subject.value,
-                        book.value,
-                        chapterName
-                    );
-
-                });
-        }
-
-
-        board.addEventListener("change", loadSubjects);
-
-        classSelect.addEventListener("change", loadSubjects);
-
-        subject.addEventListener("change", loadBooks);
-
-        book.addEventListener("change", loadChapters);
-
-        chapter.addEventListener("change", showChapter);
-    }
-
-
-    async function open910AIStudy(
-        board,
-        className,
-        subject,
-        book,
-        chapter
-    ) {
-
-        const area =
-            document.getElementById("bb910ChapterArea");
-
-        if (!area) return;
-
-        area.innerHTML = `
-            <div class="bb910-loading">
-                🤖 Chapter study material prepare ho raha hai...
-            </div>
-        `;
-
-
-        try {
-
-            const prompt = `
-You are BharatBuddy AI Learning Tutor.
-
-Board: ${board}
-Class: ${className}
-Subject: ${subject}
-Book/Section: ${book}
-Chapter: ${chapter}
-
-Create study material ONLY for this exact chapter.
-
-Include:
-
-1. Chapter Overview
-2. Important Concepts
-3. Important Definitions
-4. Easy Explanation
-5. Examples
-6. Important Points
-7. Exam Focus
-8. Quick Revision
-
-Do not discuss another chapter.
-Do not change the class or subject.
-Use simple student-friendly language.
-`;
-
-
-            const response =
-                await window.askAI?.(prompt);
-
-
-            if (!response) {
-
-                throw new Error(
-                    "AI response unavailable"
-                );
-            }
-
-
-            if (
-                window.BharatBuddyPremiumNotes
-            ) {
-
-                area.innerHTML =
-                    window.BharatBuddyPremiumNotes(
-                        response,
-                        subject,
-                        chapter
-                    );
-
-            } else {
-
-                area.innerHTML = `
-                    <div class="bb910-ai-result">
-                        ${String(response)
-                            .replace(/\n/g, "<br>")}
-                    </div>
-                `;
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Class 9-10 Study Error:",
-                error
-            );
-
-            area.innerHTML = `
-                <div class="bb910-empty">
-                    ⚠️ Study material load nahi ho paya.
-                    Please try again.
-                </div>
-            `;
-        }
-
-    }
-
-
-    async function open910Questions(
-        board,
-        className,
-        subject,
-        book,
-        chapter
-    ) {
-
-        const area =
-            document.getElementById("bb910ChapterArea");
-
-        if (!area) return;
-
-
-        area.innerHTML = `
-            <div class="bb910-loading">
-                📝 ${chapter} ke questions prepare ho rahe hain...
-            </div>
-        `;
-
-
-        try {
-
-            const prompt = `
-You are BharatBuddy AI Question Generator.
-
-Board: ${board}
-Class: ${className}
-Subject: ${subject}
-Book/Section: ${book}
-Chapter: ${chapter}
-
-Generate questions ONLY from this exact chapter.
-
-Create:
-- 5 MCQs
-- 3 Short Answer Questions
-- 2 Long Answer Questions
-
-Questions must match the selected class and chapter.
-Do not use questions from another chapter.
-Do not change the subject.
-Give answers after the questions.
-`;
-
-
-            const response =
-                await window.askAI?.(prompt);
-
-
-            if (!response) {
-
-                throw new Error(
-                    "Question response unavailable"
-                );
-            }
-
-
-            area.innerHTML = `
-                <div class="bb910-question-result">
-
-                    <div class="bb910-question-title">
-                        📝 ${chapter} — Questions
-                    </div>
-
-                    <div class="bb910-question-content">
-                        ${String(response)
-                            .replace(/\n/g, "<br>")}
-                    </div>
-
-                </div>
-            `;
-
-        } catch (error) {
-
-            console.error(
-                "Class 9-10 Question Error:",
-                error
-            );
-
-            area.innerHTML = `
-                <div class="bb910-empty">
-                    ⚠️ Questions load nahi ho paye.
-                    Please try again.
-                </div>
-            `;
-        }
-
-    }
-
-
-    function addClass910Styles() {
-
-        if (document.getElementById("bb910Styles")) return;
-
-        const style =
-            document.createElement("style");
-
-        style.id = "bb910Styles";
-
-        style.textContent = `
-
-            .bb-910-study-box {
-                padding: 24px;
-                border-radius: 22px;
-                background: var(--card-bg, #ffffff);
-                border: 1px solid rgba(0,0,0,.08);
-                margin-bottom: 25px;
-            }
-
-            .bb-910-badge {
-                font-size: 12px;
-                font-weight: 700;
-                letter-spacing: 1px;
-                opacity: .7;
-            }
-
-            .bb-910-header h2 {
-                margin: 7px 0;
-                font-size: 27px;
-            }
-
-            .bb-910-header p {
-                opacity: .7;
-                margin-bottom: 22px;
-            }
-
-            .bb-910-select-grid {
-                display: grid;
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
-                gap: 16px;
-            }
-
-            .bb-910-field {
-                display: flex;
-                flex-direction: column;
-                gap: 7px;
-            }
-
-            .bb-910-field label {
-                font-size: 13px;
-                font-weight: 700;
-            }
-
-            .bb-910-field select {
-                padding: 13px 14px;
-                border-radius: 12px;
-                border: 1px solid rgba(0,0,0,.12);
-                background: var(--bg, #fff);
-                color: inherit;
-                font-size: 14px;
-                outline: none;
-            }
-
-            .bb-910-full {
-                grid-column: 1 / -1;
-            }
-
-            .bb910-chapter-card {
-                display: flex;
-                align-items: center;
-                gap: 16px;
-                margin-top: 22px;
-                padding: 20px;
-                border-radius: 18px;
-                background: rgba(80,120,255,.08);
-            }
-
-            .bb910-chapter-icon {
-                font-size: 34px;
-            }
-
-            .bb910-chapter-info span {
-                font-size: 12px;
-                opacity: .65;
-            }
-
-            .bb910-chapter-info h3 {
-                margin: 5px 0;
-            }
-
-            .bb910-chapter-info p {
-                margin: 0;
-                opacity: .7;
-                font-size: 13px;
-            }
-
-            .bb910-action-grid {
-                display: grid;
-                grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
-                gap: 12px;
-                margin-top: 14px;
-            }
-
-            .bb910-action {
-                border: 0;
-                border-radius: 13px;
-                padding: 14px;
-                cursor: pointer;
-                font-weight: 700;
-                font-size: 14px;
-            }
-
-            .bb910-loading,
-            .bb910-empty,
-            .bb910-ai-result,
-            .bb910-question-result {
-                margin-top: 18px;
-                padding: 20px;
-                border-radius: 16px;
-                background: rgba(0,0,0,.04);
-            }
-
-            .bb910-question-title {
-                font-size: 20px;
-                font-weight: 800;
-                margin-bottom: 15px;
-            }
-
-            @media (max-width: 700px) {
-
-                .bb-910-study-box {
-                    padding: 16px;
-                }
-
-                .bb-910-select-grid,
-                .bb910-action-grid {
-                    grid-template-columns: 1fr;
-                }
-
-                .bb-910-full {
-                    grid-column: auto;
-                }
-
-                .bb910-chapter-card {
-                    align-items: flex-start;
-                }
-            }
-
-        `;
-
-        document.head.appendChild(style);
-    }
-
-
-    // Study button click
-    document.addEventListener("click", function (event) {
-
-        const studyButton =
-            event.target.closest(
-                '[data-page="study"]'
-            );
-
-        if (!studyButton) return;
-
-        setTimeout(
-            initClass9_10StudySelector,
-            350
-        );
-
-    });
-
-
-    console.log(
-        "BharatBuddy Class 9-10 Study Selector Loaded"
-    );
-
-})();
+>>>>>>> 6c5846d (Add BharatBuddy project)

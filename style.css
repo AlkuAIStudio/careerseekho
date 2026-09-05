@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap');
 
 :root {
@@ -1358,7 +1358,7 @@ button {
   .founder-card {
     margin: 0 auto !important;
   }
-=======
+
 * {
     margin: 0;
     padding: 0;
@@ -3303,5 +3303,51 @@ body.dark .progress {
         padding: 16px;
     }
 
->>>>>>> 6c5846d (Add BharatBuddy project)
+ 6c5846d (Add BharatBuddy project)
+
+/* ============================================================
+   MOBILE RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x hidden;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .container,
+    .main-content,
+    .content,
+    .study-container {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .sidebar {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+        max-width: 100%;
+    }
+
+    img,
+    video {
+        max-width: 100%;
+        height: auto;
+    }
+
 }
