@@ -16452,3 +16452,405 @@ Return clean readable text.
     };
 
 })();
+/* ============================================================
+   BHARATBUDDY - PREMIUM AI STUDY NOTES UI
+   SAFE ADD-ON
+   ============================================================ */
+
+(function () {
+    "use strict";
+
+    /* ---------- PREMIUM STUDY PAGE CSS ---------- */
+
+    const style = document.createElement("style");
+
+    style.textContent = `
+    .bb-study-wrapper {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 10px 4px 50px;
+    }
+
+    .bb-study-hero {
+        background: linear-gradient(135deg, #eef4ff, #f8fbff);
+        border: 1px solid #dbe6ff;
+        border-radius: 24px;
+        padding: 28px;
+        margin-bottom: 22px;
+        box-shadow: 0 10px 30px rgba(40, 80, 160, 0.08);
+    }
+
+    .bb-study-hero .bb-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #ffffff;
+        border: 1px solid #dce5ff;
+        border-radius: 999px;
+        padding: 7px 13px;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 14px;
+    }
+
+    .bb-study-hero h1 {
+        margin: 0 0 10px;
+        font-size: clamp(25px, 4vw, 38px);
+        line-height: 1.2;
+    }
+
+    .bb-study-hero p {
+        margin: 0;
+        color: #5d6878;
+        line-height: 1.7;
+        font-size: 15px;
+    }
+
+    .bb-note-card {
+        background: #ffffff;
+        border: 1px solid #e5e9f0;
+        border-radius: 20px;
+        padding: 23px;
+        margin: 16px 0;
+        box-shadow: 0 7px 25px rgba(0, 0, 0, 0.045);
+    }
+
+    .bb-note-card h2 {
+        margin-top: 0;
+        font-size: 22px;
+    }
+
+    .bb-note-card h3 {
+        margin-top: 24px;
+        font-size: 18px;
+    }
+
+    .bb-note-card p,
+    .bb-note-card li {
+        line-height: 1.75;
+        color: #394454;
+    }
+
+    .bb-note-card strong {
+        font-weight: 800;
+    }
+
+    .bb-important {
+        border-left: 5px solid #4f7cff;
+        background: #f4f7ff;
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin: 18px 0;
+    }
+
+    .bb-formula {
+        background: #f8f5ff;
+        border: 1px solid #e5dcff;
+        border-radius: 16px;
+        padding: 18px;
+        margin: 18px 0;
+        overflow-x: auto;
+        text-align: center;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .bb-quick {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 14px;
+        margin: 20px 0;
+    }
+
+    .bb-quick-item {
+        background: #fff;
+        border: 1px solid #e7eaf0;
+        border-radius: 16px;
+        padding: 17px;
+    }
+
+    .bb-quick-item strong {
+        display: block;
+        margin-bottom: 7px;
+    }
+
+    .bb-study-footer {
+        margin-top: 25px;
+        padding: 20px;
+        border-radius: 18px;
+        background: #f8fafc;
+        border: 1px dashed #d8dee8;
+        text-align: center;
+    }
+
+    .bb-study-footer strong {
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    @media (max-width: 700px) {
+        .bb-study-wrapper {
+            padding: 5px 0 35px;
+        }
+
+        .bb-study-hero,
+        .bb-note-card {
+            border-radius: 17px;
+            padding: 18px;
+        }
+
+        .bb-study-hero h1 {
+            font-size: 26px;
+        }
+
+        .bb-note-card h2 {
+            font-size: 20px;
+        }
+    }
+
+    /* DARK MODE */
+
+    body.dark-mode .bb-study-hero,
+    body.dark .bb-study-hero {
+        background: #171b24;
+        border-color: #293142;
+    }
+
+    body.dark-mode .bb-study-hero p,
+    body.dark .bb-study-hero p {
+        color: #b8c0ce;
+    }
+
+    body.dark-mode .bb-note-card,
+    body.dark .bb-note-card,
+    body.dark-mode .bb-quick-item,
+    body.dark .bb-quick-item {
+        background: #171b24;
+        border-color: #293142;
+    }
+
+    body.dark-mode .bb-note-card p,
+    body.dark .bb-note-card p,
+    body.dark-mode .bb-note-card li,
+    body.dark .bb-note-card li {
+        color: #d1d7e0;
+    }
+
+    body.dark-mode .bb-important,
+    body.dark .bb-important {
+        background: #1b2232;
+    }
+
+    body.dark-mode .bb-formula,
+    body.dark .bb-formula {
+        background: #211d31;
+        border-color: #3b3455;
+    }
+
+    body.dark-mode .bb-study-footer,
+    body.dark .bb-study-footer {
+        background: #171b24;
+        border-color: #343b49;
+    }
+    `;
+
+    document.head.appendChild(style);
+
+
+    /* ---------- MARKDOWN CLEANER ---------- */
+
+    function cleanMarkdown(text) {
+
+        if (!text) return "";
+
+        let html = String(text);
+
+        /* headings */
+
+        html = html.replace(
+            /^###\s+(.+)$/gm,
+            '<h3>$1</h3>'
+        );
+
+        html = html.replace(
+            /^##\s+(.+)$/gm,
+            '<h2>$1</h2>'
+        );
+
+        html = html.replace(
+            /^#\s+(.+)$/gm,
+            '<h2>$1</h2>'
+        );
+
+        /* bold */
+
+        html = html.replace(
+            /\*\*(.*?)\*\*/g,
+            '<strong>$1</strong>'
+        );
+
+        /* italic */
+
+        html = html.replace(
+            /(?<!\*)\*([^*\n]+)\*(?!\*)/g,
+            '<em>$1</em>'
+        );
+
+        /* horizontal line */
+
+        html = html.replace(
+            /^\s*---+\s*$/gm,
+            '<hr>'
+        );
+
+        /* formulas */
+
+        html = html.replace(
+            /\$\$(.*?)\$\$/gs,
+            '<div class="bb-formula">$1</div>'
+        );
+
+        html = html.replace(
+            /\\\((.*?)\\\)/gs,
+            '<span class="bb-formula">$1</span>'
+        );
+
+        /* bullet points */
+
+        html = html.replace(
+            /^[ \t]*[-*]\s+(.+)$/gm,
+            '<li>$1</li>'
+        );
+
+        /* numbered points */
+
+        html = html.replace(
+            /^[ \t]*\d+\.\s+(.+)$/gm,
+            '<li>$1</li>'
+        );
+
+        /* group consecutive li */
+
+        html = html.replace(
+            /((?:<li>.*?<\/li>\s*)+)/gs,
+            '<ul>$1</ul>'
+        );
+
+        /* paragraphs */
+
+        html = html.replace(
+            /\n{2,}/g,
+            '</p><p>'
+        );
+
+        html = '<p>' + html + '</p>';
+
+        /* remove paragraph around block elements */
+
+        html = html.replace(
+            /<p>\s*(<h[23]>)/g,
+            '$1'
+        );
+
+        html = html.replace(
+            /(<\/h[23]>)\s*<\/p>/g,
+            '$1'
+        );
+
+        html = html.replace(
+            /<p>\s*(<ul>)/g,
+            '$1'
+        );
+
+        html = html.replace(
+            /(<\/ul>)\s*<\/p>/g,
+            '$1'
+        );
+
+        html = html.replace(
+            /<p>\s*(<div class="bb-formula">)/g,
+            '$1'
+        );
+
+        html = html.replace(
+            /(<\/div>)\s*<\/p>/g,
+            '$1'
+        );
+
+        return html;
+    }
+
+
+    /* ---------- MAKE AI NOTES BEAUTIFUL ---------- */
+
+    window.BharatBuddyPremiumNotes = function (rawText, subject, chapter) {
+
+        const safeSubject = subject || "Subject";
+        const safeChapter = chapter || "Chapter";
+
+        const formatted = cleanMarkdown(rawText);
+
+        return `
+            <div class="bb-study-wrapper">
+
+                <div class="bb-study-hero">
+
+                    <div class="bb-badge">
+                        🤖 BharatBuddy AI
+                    </div>
+
+                    <h1>📚 ${safeChapter}</h1>
+
+                    <p>
+                        ${safeSubject} • Smart Study Notes
+                    </p>
+
+                    <p style="margin-top:10px;">
+                        Easy explanation, important concepts,
+                        formulas and quick revision — all in one place.
+                    </p>
+
+                </div>
+
+                <div class="bb-note-card">
+
+                    ${formatted}
+
+                </div>
+
+                <div class="bb-study-footer">
+
+                    <strong>🎯 Quick Study Tip</strong>
+
+                    Read one concept, understand the example,
+                    then try a question without looking at the answer.
+
+                </div>
+
+            </div>
+        `;
+    };
+
+
+    /* ---------- GLOBAL HELPER ---------- */
+
+    window.BharatBuddyFormatNotes = function (element, subject, chapter) {
+
+        if (!element) return;
+
+        const originalText = element.innerText || element.textContent || "";
+
+        if (!originalText.trim()) return;
+
+        element.innerHTML =
+            window.BharatBuddyPremiumNotes(
+                originalText,
+                subject,
+                chapter
+            );
+    };
+
+
+    console.log("BharatBuddy Premium Study Notes UI loaded");
+
+})();
