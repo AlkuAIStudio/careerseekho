@@ -1,137 +1,4 @@
-<<<<<<< HEAD
-// ================================
-// CAREERSEEKHO WEBSITE JAVASCRIPT
-// ================================
 
-// MOBILE MENU
-const menuBtn = document.getElementById("menuBtn");
-const navLinks = document.querySelector(".nav-links");
-
-if (menuBtn && navLinks) {
-  menuBtn.addEventListener("click", () => {
-    navLinks.classList.toggle("mobile-active");
-
-    const icon = menuBtn.querySelector("i");
-
-    if (navLinks.classList.contains("mobile-active")) {
-      icon.classList.remove("fa-bars");
-      icon.classList.add("fa-xmark");
-    } else {
-      icon.classList.remove("fa-xmark");
-      icon.classList.add("fa-bars");
-    }
-  });
-}
-
-
-// CLOSE MOBILE MENU AFTER CLICKING A LINK
-const navItems = document.querySelectorAll(".nav-links a");
-
-navItems.forEach((item) => {
-  item.addEventListener("click", () => {
-    if (navLinks) {
-      navLinks.classList.remove("mobile-active");
-    }
-
-    const icon = menuBtn?.querySelector("i");
-
-    if (icon) {
-      icon.classList.remove("fa-xmark");
-      icon.classList.add("fa-bars");
-    }
-  });
-});
-
-
-// ACTIVE NAVIGATION LINK ON SCROLL
-const sections = document.querySelectorAll("main section[id]");
-
-window.addEventListener("scroll", () => {
-  let currentSection = "";
-
-  sections.forEach((section) => {
-    const sectionTop = section.offsetTop - 150;
-    const sectionHeight = section.offsetHeight;
-
-    if (
-      window.scrollY >= sectionTop &&
-      window.scrollY < sectionTop + sectionHeight
-    ) {
-      currentSection = section.getAttribute("id");
-    }
-  });
-
-  navItems.forEach((item) => {
-    item.classList.remove("active");
-
-    const href = item.getAttribute("href");
-
-    if (href === `#${currentSection}`) {
-      item.classList.add("active");
-    }
-  });
-});
-
-
-// NAVBAR SHADOW ON SCROLL
-const navbar = document.querySelector(".navbar");
-
-window.addEventListener("scroll", () => {
-  if (navbar) {
-    if (window.scrollY > 20) {
-      navbar.classList.add("scrolled");
-    } else {
-      navbar.classList.remove("scrolled");
-    }
-  }
-});
-
-
-// SCROLL REVEAL ANIMATION
-const revealElements = document.querySelectorAll(
-  ".topic-card, .video-card, .section-heading, .alku-section"
-);
-
-revealElements.forEach((element) => {
-  element.classList.add("reveal");
-});
-
-const revealOnScroll = () => {
-  const windowHeight = window.innerHeight;
-
-  revealElements.forEach((element) => {
-    const elementTop = element.getBoundingClientRect().top;
-
-    if (elementTop < windowHeight - 80) {
-      element.classList.add("show");
-    }
-  });
-};
-
-window.addEventListener("scroll", revealOnScroll);
-window.addEventListener("load", revealOnScroll);
-
-
-// OPTIONAL: SMOOTH SCROLL FOR INTERNAL LINKS
-document.querySelectorAll('a[href^="#"]').forEach((link) => {
-  link.addEventListener("click", (event) => {
-    const targetId = link.getAttribute("href");
-
-    if (targetId === "#") return;
-
-    const target = document.querySelector(targetId);
-
-    if (target) {
-      event.preventDefault();
-
-      target.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }
-  });
-});
-=======
 "use strict";
 
 /* ============================================================
@@ -14587,4 +14454,2001 @@ Do not mention that this is a demo.
     }
 
 })();
->>>>>>> 6c5846d (Add BharatBuddy project)
+   
+/* =========================================================
+   BHARATBUDDY BOARD CURRICULUM SYSTEM
+   SAFE ADD-ON
+   Does NOT modify existing lessonData
+========================================================= */
+
+(function () {
+    "use strict";
+
+    const BOARD_STORAGE_KEY = "bharatbuddy_curriculum_v1";
+
+    let curriculumState = {
+        board: "",
+        className: "",
+        stream: "",
+        subject: "",
+        chapter: ""
+    };
+
+    /* =====================================================
+       CURRICULUM DATA
+       This is kept separate from existing lessonData
+    ===================================================== */
+
+    const boardCurriculum = {
+
+        CBSE: {
+
+            "Class 9": {
+                streams: {
+                    "General": {
+
+                        "Mathematics": [
+                            "Number Systems",
+                            "Polynomials",
+                            "Coordinate Geometry",
+                            "Linear Equations in Two Variables",
+                            "Introduction to Euclid's Geometry",
+                            "Lines and Angles",
+                            "Triangles",
+                            "Quadrilaterals",
+                            "Circles",
+                            "Heron's Formula",
+                            "Surface Areas and Volumes",
+                            "Statistics",
+                            "Probability"
+                        ],
+
+                        "Science": [
+                            "Matter in Our Surroundings",
+                            "Is Matter Around Us Pure",
+                            "Atoms and Molecules",
+                            "Structure of the Atom",
+                            "The Fundamental Unit of Life",
+                            "Tissues",
+                            "Motion",
+                            "Force and Laws of Motion",
+                            "Gravitation",
+                            "Work and Energy",
+                            "Sound",
+                            "Why Do We Fall Ill",
+                            "Natural Resources",
+                            "Improvement in Food Resources"
+                        ],
+
+                        "English": [
+                            "Grammar",
+                            "Reading Comprehension",
+                            "Writing Skills",
+                            "Literature"
+                        ],
+
+                        "Social Science": [
+                            "History",
+                            "Geography",
+                            "Political Science",
+                            "Economics"
+                        ]
+                    }
+                }
+            },
+
+            "Class 10": {
+                streams: {
+                    "General": {
+
+                        "Mathematics": [
+                            "Real Numbers",
+                            "Polynomials",
+                            "Pair of Linear Equations in Two Variables",
+                            "Quadratic Equations",
+                            "Arithmetic Progressions",
+                            "Triangles",
+                            "Coordinate Geometry",
+                            "Introduction to Trigonometry",
+                            "Some Applications of Trigonometry",
+                            "Circles",
+                            "Areas Related to Circles",
+                            "Surface Areas and Volumes",
+                            "Statistics",
+                            "Probability"
+                        ],
+
+                        "Science": [
+                            "Chemical Reactions and Equations",
+                            "Acids, Bases and Salts",
+                            "Metals and Non-metals",
+                            "Carbon and Its Compounds",
+                            "Life Processes",
+                            "Control and Coordination",
+                            "How Do Organisms Reproduce",
+                            "Heredity",
+                            "Light",
+                            "Human Eye and Colourful World",
+                            "Electricity",
+                            "Magnetic Effects of Electric Current",
+                            "Our Environment"
+                        ],
+
+                        "English": [
+                            "Grammar",
+                            "Reading Comprehension",
+                            "Writing Skills",
+                            "Literature"
+                        ],
+
+                        "Social Science": [
+                            "History",
+                            "Geography",
+                            "Political Science",
+                            "Economics"
+                        ]
+                    }
+                }
+            },
+
+            "Class 11": {
+                streams: {
+
+                    "PCM": {
+                        "Physics": [
+                            "Units and Measurements",
+                            "Motion in a Straight Line",
+                            "Motion in a Plane",
+                            "Laws of Motion",
+                            "Work, Energy and Power",
+                            "System of Particles and Rotational Motion",
+                            "Gravitation",
+                            "Mechanical Properties of Solids",
+                            "Mechanical Properties of Fluids",
+                            "Thermal Properties of Matter",
+                            "Thermodynamics",
+                            "Kinetic Theory",
+                            "Oscillations",
+                            "Waves"
+                        ],
+
+                        "Chemistry": [
+                            "Some Basic Concepts of Chemistry",
+                            "Structure of Atom",
+                            "Classification of Elements and Periodicity",
+                            "Chemical Bonding and Molecular Structure",
+                            "Thermodynamics",
+                            "Equilibrium",
+                            "Redox Reactions",
+                            "Organic Chemistry",
+                            "Hydrocarbons"
+                        ],
+
+                        "Mathematics": [
+                            "Sets",
+                            "Relations and Functions",
+                            "Trigonometric Functions",
+                            "Complex Numbers",
+                            "Linear Inequalities",
+                            "Permutations and Combinations",
+                            "Binomial Theorem",
+                            "Sequences and Series",
+                            "Straight Lines",
+                            "Conic Sections",
+                            "Introduction to Three Dimensional Geometry",
+                            "Limits and Derivatives",
+                            "Statistics",
+                            "Probability"
+                        ],
+
+                        "Computer Science": [
+                            "Computer Systems",
+                            "Python Programming",
+                            "Data Representation",
+                            "Boolean Logic",
+                            "Data Handling",
+                            "Computer Networks",
+                            "Cyber Safety"
+                        ],
+
+                        "English": [
+                            "Reading Skills",
+                            "Grammar",
+                            "Writing Skills",
+                            "Literature"
+                        ]
+                    },
+
+                    "PCB": {
+                        "Physics": [
+                            "Units and Measurements",
+                            "Motion in a Straight Line",
+                            "Motion in a Plane",
+                            "Laws of Motion",
+                            "Work, Energy and Power",
+                            "System of Particles and Rotational Motion",
+                            "Gravitation",
+                            "Mechanical Properties of Solids",
+                            "Mechanical Properties of Fluids",
+                            "Thermal Properties of Matter",
+                            "Thermodynamics",
+                            "Kinetic Theory",
+                            "Oscillations",
+                            "Waves"
+                        ],
+
+                        "Chemistry": [
+                            "Some Basic Concepts of Chemistry",
+                            "Structure of Atom",
+                            "Classification of Elements and Periodicity",
+                            "Chemical Bonding and Molecular Structure",
+                            "Thermodynamics",
+                            "Equilibrium",
+                            "Redox Reactions",
+                            "Organic Chemistry",
+                            "Hydrocarbons"
+                        ],
+
+                        "Biology": [
+                            "The Living World",
+                            "Biological Classification",
+                            "Plant Kingdom",
+                            "Animal Kingdom",
+                            "Morphology of Flowering Plants",
+                            "Anatomy of Flowering Plants",
+                            "Structural Organisation in Animals",
+                            "Cell: The Unit of Life",
+                            "Biomolecules",
+                            "Cell Cycle and Cell Division",
+                            "Transport in Plants",
+                            "Mineral Nutrition",
+                            "Photosynthesis",
+                            "Respiration in Plants",
+                            "Plant Growth and Development",
+                            "Digestion and Absorption",
+                            "Breathing and Exchange of Gases",
+                            "Body Fluids and Circulation",
+                            "Excretory Products and Their Elimination",
+                            "Locomotion and Movement",
+                            "Neural Control and Coordination",
+                            "Chemical Coordination and Integration"
+                        ],
+
+                        "English": [
+                            "Reading Skills",
+                            "Grammar",
+                            "Writing Skills",
+                            "Literature"
+                        ]
+                    },
+
+                    "Commerce": {
+                        "Accountancy": [
+                            "Introduction to Accounting",
+                            "Theory Base of Accounting",
+                            "Recording of Transactions",
+                            "Bank Reconciliation Statement",
+                            "Trial Balance",
+                            "Depreciation",
+                            "Bills of Exchange",
+                            "Financial Statements",
+                            "Computerised Accounting"
+                        ],
+
+                        "Business Studies": [
+                            "Nature and Purpose of Business",
+                            "Forms of Business Organisation",
+                            "Private, Public and Global Enterprises",
+                            "Business Services",
+                            "Emerging Modes of Business",
+                            "Social Responsibility of Business",
+                            "Formation of a Company",
+                            "Sources of Business Finance",
+                            "Small Business",
+                            "Internal Trade",
+                            "International Business"
+                        ],
+
+                        "Economics": [
+                            "Introduction to Economics",
+                            "Theory of Consumer Behaviour",
+                            "Production and Costs",
+                            "The Theory of Firm",
+                            "Market Equilibrium",
+                            "Statistics for Economics",
+                            "Collection of Data",
+                            "Organisation of Data",
+                            "Presentation of Data",
+                            "Statistical Tools",
+                            "Measures of Central Tendency"
+                        ],
+
+                        "Mathematics": [
+                            "Sets",
+                            "Relations and Functions",
+                            "Trigonometric Functions",
+                            "Complex Numbers",
+                            "Linear Inequalities",
+                            "Permutations and Combinations",
+                            "Binomial Theorem",
+                            "Sequences and Series",
+                            "Straight Lines",
+                            "Statistics",
+                            "Probability"
+                        ],
+
+                        "English": [
+                            "Reading Skills",
+                            "Grammar",
+                            "Writing Skills",
+                            "Literature"
+                        ]
+                    },
+
+                    "Arts": {
+                        "History": [
+                            "Early Societies",
+                            "Writing and City Life",
+                            "An Empire Across Three Continents",
+                            "Nomadic Empires",
+                            "The Three Orders",
+                            "Changing Cultural Traditions",
+                            "Displacing Indigenous Peoples",
+                            "Paths to Modernisation"
+                        ],
+
+                        "Geography": [
+                            "Geography as a Discipline",
+                            "The Earth",
+                            "Landforms",
+                            "Climate",
+                            "Water",
+                            "Natural Vegetation",
+                            "Natural Hazards",
+                            "India: Location",
+                            "Structure and Physiography",
+                            "Drainage",
+                            "Climate",
+                            "Natural Vegetation",
+                            "Natural Hazards"
+                        ],
+
+                        "Political Science": [
+                            "Constitution",
+                            "Rights in the Indian Constitution",
+                            "Election and Representation",
+                            "Executive",
+                            "Legislature",
+                            "Judiciary",
+                            "Federalism",
+                            "Local Governments",
+                            "Constitution as a Living Document",
+                            "Political Philosophy"
+                        ],
+
+                        "Sociology": [
+                            "Sociology and Society",
+                            "Terms, Concepts and their Use",
+                            "Understanding Social Institutions",
+                            "Culture and Socialisation",
+                            "Social Change and Social Order",
+                            "Environment and Society",
+                            "Introducing Western Sociologists",
+                            "Indian Sociologists"
+                        ],
+
+                        "English": [
+                            "Reading Skills",
+                            "Grammar",
+                            "Writing Skills",
+                            "Literature"
+                        ]
+                    }
+                }
+            },
+
+            "Class 12": {
+                streams: {
+
+                    "Science": {
+                        "Physics": [
+                            "Electric Charges and Fields",
+                            "Electrostatic Potential and Capacitance",
+                            "Current Electricity",
+                            "Moving Charges and Magnetism",
+                            "Magnetism and Matter",
+                            "Electromagnetic Induction",
+                            "Alternating Current",
+                            "Electromagnetic Waves",
+                            "Ray Optics",
+                            "Wave Optics",
+                            "Dual Nature of Radiation and Matter",
+                            "Atoms",
+                            "Nuclei",
+                            "Semiconductor Electronics"
+                        ],
+
+                        "Chemistry": [
+                            "Solutions",
+                            "Electrochemistry",
+                            "Chemical Kinetics",
+                            "d and f Block Elements",
+                            "Coordination Compounds",
+                            "Haloalkanes and Haloarenes",
+                            "Alcohols, Phenols and Ethers",
+                            "Aldehydes, Ketones and Carboxylic Acids",
+                            "Amines",
+                            "Biomolecules"
+                        ],
+
+                        "Mathematics": [
+                            "Relations and Functions",
+                            "Inverse Trigonometric Functions",
+                            "Matrices",
+                            "Determinants",
+                            "Continuity and Differentiability",
+                            "Application of Derivatives",
+                            "Integrals",
+                            "Application of Integrals",
+                            "Differential Equations",
+                            "Vector Algebra",
+                            "Three Dimensional Geometry",
+                            "Linear Programming",
+                            "Probability"
+                        ],
+
+                        "Biology": [
+                            "Sexual Reproduction in Flowering Plants",
+                            "Human Reproduction",
+                            "Reproductive Health",
+                            "Principles of Inheritance",
+                            "Molecular Basis of Inheritance",
+                            "Evolution",
+                            "Human Health and Disease",
+                            "Microbes in Human Welfare",
+                            "Biotechnology",
+                            "Organisms and Populations",
+                            "Ecosystem",
+                            "Biodiversity and Conservation"
+                        ],
+
+                        "Computer Science": [
+                            "Python Revision Tour",
+                            "Functions",
+                            "File Handling",
+                            "Data Structures",
+                            "Computer Networks",
+                            "Database Concepts",
+                            "SQL"
+                        ],
+
+                        "English": [
+                            "Reading Skills",
+                            "Grammar",
+                            "Writing Skills",
+                            "Literature"
+                        ]
+                    },
+
+                    "Commerce": {
+                        "Accountancy": [
+                            "Accounting for Partnership Firms",
+                            "Change in Profit Sharing Ratio",
+                            "Admission of a Partner",
+                            "Retirement of a Partner",
+                            "Dissolution of Partnership",
+                            "Accounting for Companies",
+                            "Analysis of Financial Statements",
+                            "Cash Flow Statement"
+                        ],
+
+                        "Business Studies": [
+                            "Nature and Significance of Management",
+                            "Principles of Management",
+                            "Business Environment",
+                            "Planning",
+                            "Organising",
+                            "Staffing",
+                            "Directing",
+                            "Controlling",
+                            "Financial Management",
+                            "Marketing Management",
+                            "Consumer Protection"
+                        ],
+
+                        "Economics": [
+                            "National Income",
+                            "Money and Banking",
+                            "Determination of Income and Employment",
+                            "Government Budget",
+                            "Balance of Payments",
+                            "Indian Economy",
+                            "Economic Reforms",
+                            "Human Capital Formation",
+                            "Rural Development",
+                            "Employment",
+                            "Sustainable Development"
+                        ],
+
+                        "Mathematics": [
+                            "Relations and Functions",
+                            "Matrices",
+                            "Determinants",
+                            "Calculus",
+                            "Vector Algebra",
+                            "Three Dimensional Geometry",
+                            "Linear Programming",
+                            "Probability"
+                        ],
+
+                        "English": [
+                            "Reading Skills",
+                            "Grammar",
+                            "Writing Skills",
+                            "Literature"
+                        ]
+                    },
+
+                    "Arts": {
+                        "History": [
+                            "Bricks, Beads and Bones",
+                            "Kings, Farmers and Towns",
+                            "Kinship, Caste and Class",
+                            "Thinkers, Beliefs and Buildings",
+                            "Through the Eyes of Travellers",
+                            "Bhakti-Sufi Traditions",
+                            "An Imperial Capital",
+                            "Peasants, Zamindars and the State",
+                            "Colonialism and the Countryside",
+                            "Rebels and the Raj",
+                            "Mahatma Gandhi and the Nationalist Movement",
+                            "Framing the Constitution"
+                        ],
+
+                        "Geography": [
+                            "Human Geography",
+                            "Population",
+                            "Human Development",
+                            "Primary Activities",
+                            "Secondary Activities",
+                            "Tertiary Activities",
+                            "Transport and Communication",
+                            "International Trade",
+                            "Population Distribution",
+                            "Migration",
+                            "Human Settlements",
+                            "Resources",
+                            "Water Resources",
+                            "Mineral Resources",
+                            "Manufacturing Industries",
+                            "Planning and Sustainable Development"
+                        ],
+
+                        "Political Science": [
+                            "The End of Bipolarity",
+                            "Contemporary Centres of Power",
+                            "Challenges of Nation-Building",
+                            "Era of One-Party Dominance",
+                            "Politics of Planned Development",
+                            "Crisis of Democratic Order",
+                            "Regional Aspirations",
+                            "Recent Developments in Indian Politics"
+                        ],
+
+                        "Sociology": [
+                            "Introducing Indian Society",
+                            "Demographic Structure",
+                            "Social Institutions",
+                            "Market as a Social Institution",
+                            "Patterns of Social Inequality",
+                            "Cultural Diversity",
+                            "Structural Change",
+                            "Cultural Change",
+                            "Change and Development in Rural Society",
+                            "Change and Development in Industrial Society"
+                        ],
+
+                        "English": [
+                            "Reading Skills",
+                            "Grammar",
+                            "Writing Skills",
+                            "Literature"
+                        ]
+                    }
+                }
+            }
+        },
+
+        /* =================================================
+           BSEB
+           Separate data so CBSE and BSEB never mix
+        ================================================= */
+
+        BSEB: {
+
+            "Class 9": {
+                streams: {
+                    "General": {
+                        "Mathematics": [
+                            "Number System",
+                            "Polynomials",
+                            "Coordinate Geometry",
+                            "Linear Equations",
+                            "Lines and Angles",
+                            "Triangles",
+                            "Quadrilaterals",
+                            "Circles",
+                            "Heron's Formula",
+                            "Surface Areas and Volumes",
+                            "Statistics",
+                            "Probability"
+                        ],
+
+                        "Science": [
+                            "Matter",
+                            "Atoms and Molecules",
+                            "Structure of Atom",
+                            "Motion",
+                            "Force",
+                            "Gravitation",
+                            "Work and Energy",
+                            "Sound",
+                            "Cell",
+                            "Tissues",
+                            "Health",
+                            "Natural Resources"
+                        ],
+
+                        "English": [
+                            "Reading",
+                            "Grammar",
+                            "Writing",
+                            "Literature"
+                        ],
+
+                        "Social Science": [
+                            "History",
+                            "Geography",
+                            "Civics",
+                            "Economics"
+                        ],
+
+                        "Hindi": [
+                            "गद्य",
+                            "पद्य",
+                            "व्याकरण",
+                            "लेखन"
+                        ]
+                    }
+                }
+            },
+
+            "Class 10": {
+                streams: {
+                    "General": {
+                        "Mathematics": [
+                            "Real Numbers",
+                            "Polynomials",
+                            "Linear Equations",
+                            "Quadratic Equations",
+                            "Arithmetic Progressions",
+                            "Triangles",
+                            "Coordinate Geometry",
+                            "Trigonometry",
+                            "Circles",
+                            "Areas",
+                            "Surface Areas and Volumes",
+                            "Statistics",
+                            "Probability"
+                        ],
+
+                        "Science": [
+                            "Chemical Reactions",
+                            "Acids Bases and Salts",
+                            "Metals and Non-metals",
+                            "Carbon Compounds",
+                            "Life Processes",
+                            "Control and Coordination",
+                            "Reproduction",
+                            "Heredity",
+                            "Light",
+                            "Electricity",
+                            "Magnetic Effects",
+                            "Environment"
+                        ],
+
+                        "English": [
+                            "Reading",
+                            "Grammar",
+                            "Writing",
+                            "Literature"
+                        ],
+
+                        "Social Science": [
+                            "History",
+                            "Geography",
+                            "Civics",
+                            "Economics"
+                        ],
+
+                        "Hindi": [
+                            "गद्य",
+                            "पद्य",
+                            "व्याकरण",
+                            "लेखन"
+                        ]
+                    }
+                }
+            },
+
+            "Class 11": {
+                streams: {
+
+                    "Science": {
+                        "Physics": [
+                            "Units and Measurements",
+                            "Motion",
+                            "Laws of Motion",
+                            "Work Energy and Power",
+                            "Rotational Motion",
+                            "Gravitation",
+                            "Properties of Matter",
+                            "Thermodynamics",
+                            "Kinetic Theory",
+                            "Oscillations",
+                            "Waves"
+                        ],
+
+                        "Chemistry": [
+                            "Basic Concepts",
+                            "Structure of Atom",
+                            "Periodic Classification",
+                            "Chemical Bonding",
+                            "Thermodynamics",
+                            "Equilibrium",
+                            "Redox Reactions",
+                            "Organic Chemistry",
+                            "Hydrocarbons"
+                        ],
+
+                        "Mathematics": [
+                            "Sets",
+                            "Relations and Functions",
+                            "Trigonometry",
+                            "Complex Numbers",
+                            "Permutations and Combinations",
+                            "Binomial Theorem",
+                            "Sequences and Series",
+                            "Coordinate Geometry",
+                            "Limits",
+                            "Statistics",
+                            "Probability"
+                        ],
+
+                        "Biology": [
+                            "Living World",
+                            "Biological Classification",
+                            "Plant Kingdom",
+                            "Animal Kingdom",
+                            "Cell",
+                            "Biomolecules",
+                            "Plant Physiology",
+                            "Human Physiology"
+                        ],
+
+                        "English": [
+                            "Reading",
+                            "Grammar",
+                            "Writing",
+                            "Literature"
+                        ]
+                    },
+
+                    "Commerce": {
+                        "Accountancy": [
+                            "Introduction to Accounting",
+                            "Theory Base",
+                            "Recording Transactions",
+                            "Trial Balance",
+                            "Depreciation",
+                            "Financial Statements"
+                        ],
+
+                        "Business Studies": [
+                            "Nature of Business",
+                            "Forms of Organisation",
+                            "Business Services",
+                            "Emerging Business",
+                            "Social Responsibility",
+                            "Business Finance",
+                            "Internal Trade"
+                        ],
+
+                        "Economics": [
+                            "Introduction",
+                            "Consumer Behaviour",
+                            "Production",
+                            "Market",
+                            "Statistics",
+                            "Data Collection",
+                            "Data Presentation",
+                            "Statistical Tools"
+                        ],
+
+                        "Mathematics": [
+                            "Sets",
+                            "Relations and Functions",
+                            "Trigonometry",
+                            "Complex Numbers",
+                            "Permutations",
+                            "Binomial Theorem",
+                            "Sequences",
+                            "Statistics",
+                            "Probability"
+                        ],
+
+                        "English": [
+                            "Reading",
+                            "Grammar",
+                            "Writing",
+                            "Literature"
+                        ]
+                    },
+
+                    "Arts": {
+                        "History": [
+                            "Ancient Societies",
+                            "Early Civilisations",
+                            "Empires",
+                            "Medieval Society",
+                            "Cultural Traditions",
+                            "Modernisation"
+                        ],
+
+                        "Geography": [
+                            "Geography as a Discipline",
+                            "Earth",
+                            "Landforms",
+                            "Climate",
+                            "Water",
+                            "Natural Vegetation",
+                            "India"
+                        ],
+
+                        "Political Science": [
+                            "Constitution",
+                            "Rights",
+                            "Election",
+                            "Executive",
+                            "Legislature",
+                            "Judiciary",
+                            "Federalism"
+                        ],
+
+                        "Sociology": [
+                            "Society",
+                            "Social Institutions",
+                            "Culture",
+                            "Socialisation",
+                            "Social Change"
+                        ],
+
+                        "English": [
+                            "Reading",
+                            "Grammar",
+                            "Writing",
+                            "Literature"
+                        ]
+                    }
+                }
+            },
+
+            "Class 12": {
+                streams: {
+
+                    "Science": {
+                        "Physics": [
+                            "Electric Charges and Fields",
+                            "Electrostatic Potential",
+                            "Current Electricity",
+                            "Moving Charges and Magnetism",
+                            "Magnetism",
+                            "Electromagnetic Induction",
+                            "Alternating Current",
+                            "Electromagnetic Waves",
+                            "Ray Optics",
+                            "Wave Optics",
+                            "Dual Nature",
+                            "Atoms",
+                            "Nuclei",
+                            "Semiconductor Electronics"
+                        ],
+
+                        "Chemistry": [
+                            "Solutions",
+                            "Electrochemistry",
+                            "Chemical Kinetics",
+                            "d and f Block",
+                            "Coordination Compounds",
+                            "Haloalkanes",
+                            "Alcohols Phenols and Ethers",
+                            "Aldehydes Ketones",
+                            "Amines",
+                            "Biomolecules"
+                        ],
+
+                        "Mathematics": [
+                            "Relations and Functions",
+                            "Matrices",
+                            "Determinants",
+                            "Continuity",
+                            "Derivatives",
+                            "Integrals",
+                            "Differential Equations",
+                            "Vectors",
+                            "Three Dimensional Geometry",
+                            "Probability"
+                        ],
+
+                        "Biology": [
+                            "Reproduction",
+                            "Genetics",
+                            "Evolution",
+                            "Human Health",
+                            "Biotechnology",
+                            "Ecology",
+                            "Biodiversity"
+                        ],
+
+                        "English": [
+                            "Reading",
+                            "Grammar",
+                            "Writing",
+                            "Literature"
+                        ]
+                    },
+
+                    "Commerce": {
+                        "Accountancy": [
+                            "Partnership Accounts",
+                            "Admission",
+                            "Retirement",
+                            "Dissolution",
+                            "Company Accounts",
+                            "Financial Statements",
+                            "Cash Flow"
+                        ],
+
+                        "Business Studies": [
+                            "Management",
+                            "Planning",
+                            "Organising",
+                            "Staffing",
+                            "Directing",
+                            "Controlling",
+                            "Financial Management",
+                            "Marketing",
+                            "Consumer Protection"
+                        ],
+
+                        "Economics": [
+                            "National Income",
+                            "Money and Banking",
+                            "Income and Employment",
+                            "Government Budget",
+                            "Balance of Payments",
+                            "Indian Economy",
+                            "Economic Reforms",
+                            "Employment",
+                            "Sustainable Development"
+                        ],
+
+                        "Mathematics": [
+                            "Relations and Functions",
+                            "Matrices",
+                            "Determinants",
+                            "Calculus",
+                            "Vectors",
+                            "Three Dimensional Geometry",
+                            "Probability"
+                        ],
+
+                        "English": [
+                            "Reading",
+                            "Grammar",
+                            "Writing",
+                            "Literature"
+                        ]
+                    },
+
+                    "Arts": {
+                        "History": [
+                            "Ancient India",
+                            "Medieval India",
+                            "Colonial India",
+                            "National Movement",
+                            "Constitution"
+                        ],
+
+                        "Geography": [
+                            "Human Geography",
+                            "Population",
+                            "Human Development",
+                            "Resources",
+                            "Agriculture",
+                            "Industries",
+                            "Transport",
+                            "India"
+                        ],
+
+                        "Political Science": [
+                            "Political Theory",
+                            "Indian Constitution",
+                            "Democracy",
+                            "Federalism",
+                            "International Politics",
+                            "Indian Politics"
+                        ],
+
+                        "Sociology": [
+                            "Indian Society",
+                            "Demography",
+                            "Social Institutions",
+                            "Inequality",
+                            "Cultural Diversity",
+                            "Social Change"
+                        ],
+
+                        "English": [
+                            "Reading",
+                            "Grammar",
+                            "Writing",
+                            "Literature"
+                        ]
+                    }
+                }
+            }
+        }
+    };
+
+
+    /* =====================================================
+       STORAGE
+    ===================================================== */
+
+    function loadCurriculumState() {
+        try {
+            const saved = localStorage.getItem(BOARD_STORAGE_KEY);
+
+            if (saved) {
+                curriculumState = {
+                    ...curriculumState,
+                    ...JSON.parse(saved)
+                };
+            }
+        } catch (error) {
+            console.warn("Curriculum storage error:", error);
+        }
+    }
+
+    function saveCurriculumState() {
+        try {
+            localStorage.setItem(
+                BOARD_STORAGE_KEY,
+                JSON.stringify(curriculumState)
+            );
+        } catch (error) {
+            console.warn("Curriculum save error:", error);
+        }
+    }
+
+
+    /* =====================================================
+       HELPERS
+    ===================================================== */
+
+    function getClasses(board) {
+        if (!boardCurriculum[board]) return [];
+        return Object.keys(boardCurriculum[board]);
+    }
+
+    function getStreams(board, className) {
+        if (
+            !boardCurriculum[board] ||
+            !boardCurriculum[board][className]
+        ) {
+            return [];
+        }
+
+        return Object.keys(
+            boardCurriculum[board][className].streams
+        );
+    }
+
+    function getSubjects(board, className, stream) {
+        try {
+            return Object.keys(
+                boardCurriculum[board][className]
+                    .streams[stream]
+            );
+        } catch {
+            return [];
+        }
+    }
+
+    function getChapters(board, className, stream, subject) {
+        try {
+            return boardCurriculum[board][className]
+                .streams[stream][subject] || [];
+        } catch {
+            return [];
+        }
+    }
+
+
+    /* =====================================================
+       UI
+    ===================================================== */
+
+    function createBoardSystem() {
+
+        const pageContent = document.getElementById("pageContent");
+
+        if (!pageContent) return;
+
+        if (document.getElementById("bharatBuddyBoardSystem")) {
+            return;
+        }
+
+        const wrapper = document.createElement("div");
+
+        wrapper.id = "bharatBuddyBoardSystem";
+
+        wrapper.innerHTML = `
+            <div style="
+                margin-bottom:25px;
+                padding:22px;
+                border-radius:18px;
+                background:linear-gradient(135deg,#eef4ff,#ffffff);
+                border:1px solid #dce5f5;
+                box-shadow:0 8px 30px rgba(0,0,0,.06);
+            ">
+
+                <div style="margin-bottom:18px;">
+                    <h2 style="margin:0 0 6px;">
+                        📚 Board Study
+                    </h2>
+
+                    <p style="margin:0;opacity:.7;">
+                        Apna Board, Class, Stream, Subject aur Chapter select karo.
+                    </p>
+                </div>
+
+
+                <div style="
+                    display:grid;
+                    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+                    gap:14px;
+                ">
+
+                    <div>
+                        <label>Board</label>
+                        <select id="bbBoardSelect"
+                            style="width:100%;padding:12px;border-radius:10px;">
+                            <option value="">Select Board</option>
+                            <option value="CBSE">CBSE</option>
+                            <option value="BSEB">BSEB</option>
+                        </select>
+                    </div>
+
+
+                    <div>
+                        <label>Class</label>
+                        <select id="bbClassSelect"
+                            style="width:100%;padding:12px;border-radius:10px;"
+                            disabled>
+                            <option value="">Select Class</option>
+                        </select>
+                    </div>
+
+
+                    <div id="bbStreamBox">
+                        <label>Stream</label>
+                        <select id="bbStreamSelect"
+                            style="width:100%;padding:12px;border-radius:10px;"
+                            disabled>
+                            <option value="">Select Stream</option>
+                        </select>
+                    </div>
+
+
+                    <div>
+                        <label>Subject</label>
+                        <select id="bbSubjectSelect"
+                            style="width:100%;padding:12px;border-radius:10px;"
+                            disabled>
+                            <option value="">Select Subject</option>
+                        </select>
+                    </div>
+
+
+                    <div>
+                        <label>Chapter</label>
+                        <select id="bbChapterSelect"
+                            style="width:100%;padding:12px;border-radius:10px;"
+                            disabled>
+                            <option value="">Select Chapter</option>
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <div style="
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:10px;
+                    margin-top:18px;
+                ">
+
+                    <button id="bbStudyBtn"
+                        style="
+                            padding:12px 18px;
+                            border:0;
+                            border-radius:10px;
+                            cursor:pointer;
+                            font-weight:600;
+                        ">
+                        🤖 AI Study Notes
+                    </button>
+
+                    <button id="bbTestBtn"
+                        style="
+                            padding:12px 18px;
+                            border:0;
+                            border-radius:10px;
+                            cursor:pointer;
+                            font-weight:600;
+                        ">
+                        📝 Chapter Test
+                    </button>
+
+                </div>
+
+
+                <div id="bbSelectionInfo"
+                    style="
+                        margin-top:18px;
+                        padding:14px;
+                        border-radius:12px;
+                        background:rgba(255,255,255,.8);
+                        display:none;
+                    ">
+                </div>
+
+            </div>
+        `;
+
+        pageContent.prepend(wrapper);
+
+        loadCurriculumState();
+
+        setupBoardEvents();
+
+        restoreBoardSelection();
+    }
+
+
+    /* =====================================================
+       EVENTS
+    ===================================================== */
+
+    function setupBoardEvents() {
+
+        const board = document.getElementById("bbBoardSelect");
+        const classSelect = document.getElementById("bbClassSelect");
+        const stream = document.getElementById("bbStreamSelect");
+        const subject = document.getElementById("bbSubjectSelect");
+        const chapter = document.getElementById("bbChapterSelect");
+
+        if (!board) return;
+
+
+        board.addEventListener("change", function () {
+
+            curriculumState.board = this.value;
+            curriculumState.className = "";
+            curriculumState.stream = "";
+            curriculumState.subject = "";
+            curriculumState.chapter = "";
+
+            saveCurriculumState();
+
+            fillClasses();
+            clearSelect(stream, "Select Stream");
+            clearSelect(subject, "Select Subject");
+            clearSelect(chapter, "Select Chapter");
+        });
+
+
+        classSelect.addEventListener("change", function () {
+
+            curriculumState.className = this.value;
+            curriculumState.stream = "";
+            curriculumState.subject = "";
+            curriculumState.chapter = "";
+
+            saveCurriculumState();
+
+            fillStreams();
+            clearSelect(subject, "Select Subject");
+            clearSelect(chapter, "Select Chapter");
+        });
+
+
+        stream.addEventListener("change", function () {
+
+            curriculumState.stream = this.value;
+            curriculumState.subject = "";
+            curriculumState.chapter = "";
+
+            saveCurriculumState();
+
+            fillSubjects();
+            clearSelect(chapter, "Select Chapter");
+        });
+
+
+        subject.addEventListener("change", function () {
+
+            curriculumState.subject = this.value;
+            curriculumState.chapter = "";
+
+            saveCurriculumState();
+
+            fillChapters();
+        });
+
+
+        chapter.addEventListener("change", function () {
+
+            curriculumState.chapter = this.value;
+
+            saveCurriculumState();
+
+            showSelection();
+        });
+
+
+        document.getElementById("bbStudyBtn")
+            .addEventListener("click", generateStudyNotes);
+
+
+        document.getElementById("bbTestBtn")
+            .addEventListener("click", generateChapterTest);
+    }
+
+
+    /* =====================================================
+       SELECT HELPERS
+    ===================================================== */
+
+    function clearSelect(select, text) {
+
+        if (!select) return;
+
+        select.innerHTML =
+            `<option value="">${text}</option>`;
+
+        select.disabled = true;
+    }
+
+
+    function fillClasses() {
+
+        const select =
+            document.getElementById("bbClassSelect");
+
+        const classes =
+            getClasses(curriculumState.board);
+
+        select.innerHTML =
+            `<option value="">Select Class</option>`;
+
+        classes.forEach(className => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = className;
+            option.textContent = className;
+
+            select.appendChild(option);
+        });
+
+        select.disabled = classes.length === 0;
+    }
+
+
+    function fillStreams() {
+
+        const select =
+            document.getElementById("bbStreamSelect");
+
+        const streams =
+            getStreams(
+                curriculumState.board,
+                curriculumState.className
+            );
+
+        select.innerHTML =
+            `<option value="">Select Stream</option>`;
+
+        streams.forEach(streamName => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = streamName;
+            option.textContent = streamName;
+
+            select.appendChild(option);
+        });
+
+        select.disabled = streams.length === 0;
+
+        const streamBox =
+            document.getElementById("bbStreamBox");
+
+        /*
+          Class 9/10 has General.
+          We still keep it simple for the user.
+        */
+
+        if (
+            streams.length === 1 &&
+            streams[0] === "General"
+        ) {
+            select.value = "General";
+            curriculumState.stream = "General";
+
+            saveCurriculumState();
+
+            fillSubjects();
+        }
+    }
+
+
+    function fillSubjects() {
+
+        const select =
+            document.getElementById("bbSubjectSelect");
+
+        const subjects =
+            getSubjects(
+                curriculumState.board,
+                curriculumState.className,
+                curriculumState.stream
+            );
+
+        select.innerHTML =
+            `<option value="">Select Subject</option>`;
+
+        subjects.forEach(subjectName => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = subjectName;
+            option.textContent = subjectName;
+
+            select.appendChild(option);
+        });
+
+        select.disabled = subjects.length === 0;
+    }
+
+
+    function fillChapters() {
+
+        const select =
+            document.getElementById("bbChapterSelect");
+
+        const chapters =
+            getChapters(
+                curriculumState.board,
+                curriculumState.className,
+                curriculumState.stream,
+                curriculumState.subject
+            );
+
+        select.innerHTML =
+            `<option value="">Select Chapter</option>`;
+
+        chapters.forEach((chapterName, index) => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = chapterName;
+
+            option.textContent =
+                `${index + 1}. ${chapterName}`;
+
+            select.appendChild(option);
+        });
+
+        select.disabled = chapters.length === 0;
+    }
+
+
+    /* =====================================================
+       RESTORE
+    ===================================================== */
+
+    function restoreBoardSelection() {
+
+        if (!curriculumState.board) return;
+
+        const board =
+            document.getElementById("bbBoardSelect");
+
+        board.value =
+            curriculumState.board;
+
+        fillClasses();
+
+        const classSelect =
+            document.getElementById("bbClassSelect");
+
+        classSelect.value =
+            curriculumState.className;
+
+        if (curriculumState.className) {
+
+            fillStreams();
+
+            const stream =
+                document.getElementById("bbStreamSelect");
+
+            stream.value =
+                curriculumState.stream;
+
+            if (curriculumState.stream) {
+
+                fillSubjects();
+
+                const subject =
+                    document.getElementById("bbSubjectSelect");
+
+                subject.value =
+                    curriculumState.subject;
+
+                if (curriculumState.subject) {
+
+                    fillChapters();
+
+                    const chapter =
+                        document.getElementById("bbChapterSelect");
+
+                    chapter.value =
+                        curriculumState.chapter;
+
+                    showSelection();
+                }
+            }
+        }
+    }
+
+
+    /* =====================================================
+       SELECTION INFO
+    ===================================================== */
+
+    function showSelection() {
+
+        const info =
+            document.getElementById("bbSelectionInfo");
+
+        if (
+            !curriculumState.board ||
+            !curriculumState.className ||
+            !curriculumState.subject ||
+            !curriculumState.chapter
+        ) {
+            info.style.display = "none";
+            return;
+        }
+
+        info.style.display = "block";
+
+        info.innerHTML = `
+            <strong>Current Selection</strong><br>
+            🏫 ${curriculumState.board}
+            &nbsp; | &nbsp;
+            🎓 ${curriculumState.className}
+            &nbsp; | &nbsp;
+            📖 ${curriculumState.subject}
+            &nbsp; | &nbsp;
+            📚 ${curriculumState.chapter}
+        `;
+    }
+
+
+    /* =====================================================
+       AI STUDY NOTES
+    ===================================================== */
+
+    async function generateStudyNotes() {
+
+        if (
+            !curriculumState.board ||
+            !curriculumState.className ||
+            !curriculumState.subject ||
+            !curriculumState.chapter
+        ) {
+
+            alert(
+                "Pehle Board, Class, Stream, Subject aur Chapter select karo."
+            );
+
+            return;
+        }
+
+        const btn =
+            document.getElementById("bbStudyBtn");
+
+        const originalText =
+            btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = "⏳ AI Notes bana raha hai...";
+
+        try {
+
+            const prompt = `
+You are BharatBuddy AI, an educational tutor.
+
+Create ORIGINAL educational study notes for exactly:
+
+Board: ${curriculumState.board}
+Class: ${curriculumState.className}
+Stream: ${curriculumState.stream || "General"}
+Subject: ${curriculumState.subject}
+Chapter: ${curriculumState.chapter}
+
+STRICT RULES:
+1. Do not mix another class.
+2. Do not mix another board.
+3. Do not mix another chapter.
+4. Do not reproduce textbook paragraphs.
+5. Explain in simple student-friendly language.
+6. Include important concepts.
+7. Include definitions where useful.
+8. Include formulas only where relevant.
+9. Include examples.
+10. End with 5 quick revision points.
+
+Use clear headings and bullet points.
+`;
+
+            if (typeof askAI === "function") {
+
+                const response =
+                    await askAI(prompt);
+
+                showBoardAIResult(
+                    response,
+                    "📚 AI Study Notes"
+                );
+
+            } else {
+
+                alert(
+                    "AI function available nahi hai. Existing askAI() function check karo."
+                );
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Board AI Error:",
+                error
+            );
+
+            alert(
+                "AI Notes generate nahi ho paaye. Internet/API check karo."
+            );
+
+        } finally {
+
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+
+
+    /* =====================================================
+       CHAPTER TEST
+    ===================================================== */
+
+    async function generateChapterTest() {
+
+        if (
+            !curriculumState.board ||
+            !curriculumState.className ||
+            !curriculumState.subject ||
+            !curriculumState.chapter
+        ) {
+
+            alert(
+                "Pehle Board, Class, Stream, Subject aur Chapter select karo."
+            );
+
+            return;
+        }
+
+        const btn =
+            document.getElementById("bbTestBtn");
+
+        const originalText =
+            btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = "⏳ Test prepare ho raha hai...";
+
+        try {
+
+            const prompt = `
+Create a chapter test for BharatBuddy AI.
+
+Board: ${curriculumState.board}
+Class: ${curriculumState.className}
+Stream: ${curriculumState.stream || "General"}
+Subject: ${curriculumState.subject}
+Chapter: ${curriculumState.chapter}
+
+Create:
+- 5 MCQ questions
+- 4 options for each MCQ
+- correct answer
+- short explanation
+
+Questions must be specifically related to the selected chapter.
+Do not mix other classes, boards or chapters.
+
+Return clean readable text.
+`;
+
+            if (typeof askAI === "function") {
+
+                const response =
+                    await askAI(prompt);
+
+                showBoardAIResult(
+                    response,
+                    "📝 Chapter Test"
+                );
+
+            } else {
+
+                alert(
+                    "AI function available nahi hai."
+                );
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Chapter Test Error:",
+                error
+            );
+
+            alert(
+                "Chapter test generate nahi ho paaya."
+            );
+
+        } finally {
+
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+
+
+    /* =====================================================
+       AI RESULT DISPLAY
+    ===================================================== */
+
+    function showBoardAIResult(text, title) {
+
+        const pageContent =
+            document.getElementById("pageContent");
+
+        if (!pageContent) return;
+
+        const old =
+            document.getElementById(
+                "bbBoardAIResult"
+            );
+
+        if (old) old.remove();
+
+        const result =
+            document.createElement("div");
+
+        result.id =
+            "bbBoardAIResult";
+
+        result.style.cssText = `
+            margin-top:20px;
+            padding:22px;
+            border-radius:18px;
+            background:#ffffff;
+            border:1px solid #e1e7f0;
+            box-shadow:0 8px 30px rgba(0,0,0,.06);
+            line-height:1.7;
+            white-space:pre-wrap;
+        `;
+
+        result.innerHTML = `
+            <h2 style="margin-top:0;">
+                ${title}
+            </h2>
+
+            <div>
+                ${escapeHTML(String(text || "No response"))}
+            </div>
+        `;
+
+        pageContent.appendChild(result);
+
+        result.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+
+
+    function escapeHTML(text) {
+
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    /* =====================================================
+       SAFE STUDY PAGE INTEGRATION
+       Existing openPage/renderStudy remains untouched
+    ===================================================== */
+
+    function tryInjectBoardSystem() {
+
+        const pageContent =
+            document.getElementById("pageContent");
+
+        if (!pageContent) return;
+
+        /*
+          Only add the system when Study page is active.
+        */
+
+        const studyButton =
+            document.querySelector(
+                '[data-page="study"]'
+            );
+
+        if (!studyButton) return;
+
+        const isStudyPage =
+            studyButton.classList.contains("active") ||
+            document.body.dataset.currentPage === "study";
+
+        /*
+          If current app does not expose active state,
+          we still check the page title.
+        */
+
+        const pageTitle =
+            document.getElementById("pageTitle");
+
+        const titleText =
+            pageTitle
+                ? pageTitle.textContent.toLowerCase()
+                : "";
+
+        if (
+            titleText.includes("study") ||
+            titleText.includes("ncert") ||
+            titleText.includes("lesson")
+        ) {
+            createBoardSystem();
+        }
+    }
+
+
+    /* =====================================================
+       INITIALIZATION
+    ===================================================== */
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            /*
+              Wait for existing BharatBuddy
+              JavaScript to finish rendering.
+            */
+
+            setTimeout(
+                tryInjectBoardSystem,
+                700
+            );
+
+
+            /*
+              Study button click
+            */
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    const studyButton =
+                        event.target.closest(
+                            '[data-page="study"]'
+                        );
+
+                    if (!studyButton) return;
+
+                    setTimeout(
+                        createBoardSystem,
+                        500
+                    );
+                }
+            );
+
+        }
+    );
+
+
+    /*
+      Public debugging object.
+      Does not interfere with existing BharatBuddyStudy.
+    */
+
+    window.BharatBuddyBoardSystem = {
+        getState: function () {
+            return { ...curriculumState };
+        },
+
+        reset: function () {
+
+            curriculumState = {
+                board: "",
+                className: "",
+                stream: "",
+                subject: "",
+                chapter: ""
+            };
+
+            localStorage.removeItem(
+                BOARD_STORAGE_KEY
+            );
+
+            const system =
+                document.getElementById(
+                    "bharatBuddyBoardSystem"
+                );
+
+            if (system) system.remove();
+        },
+
+        data: boardCurriculum
+    };
+
+})();
